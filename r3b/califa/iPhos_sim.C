@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------
 
 
-Int_t r3bsim(){
+Int_t iPhos_sim(){
   
   // Load the Main Simulation macro
   TString macro_r3ball = getenv("VMCWORKDIR");
@@ -19,10 +19,12 @@ Int_t r3bsim(){
   gROOT->LoadMacro(macro_r3ball.Data());
   
   // Input files
-  TString EventFile = "p2p_O18_no_exc_state_without_gammas_of_course.dat";
+  //TString EventFile = "p2p_O18_no_exc_state_without_gammas_of_course.dat";
   //TString EventFile = "p2p_O18_first_exc_state_with_gammas.dat";
+  TString EventFile = "p2p_O18_first_exc_state_with_gammas_no_doppler.dat";
   //TString EventFile = "p2p_O18_second_exc_state_with_gammas.dat";
   //TString EventFile = "p2p_O18_third_exc_state_with_gammas.dat";
+  //TString EventFile = "evt_gen.dat";
 
   // Output files
   TString OutFile = "r3bsim.root";
@@ -43,6 +45,7 @@ Int_t r3bsim(){
   // Box generator:             "box"
   // CALIFA generator:          "gammas"
   // R3B spec. generator:       "r3b"
+  // Events from file:          "ascii"
   TString fGene="ascii";
   
   //-------------------------------------------------
@@ -81,8 +84,8 @@ Int_t r3bsim(){
   //
   //   Neutron:                 LAND
   TMap detGeo;
-  detGeo.Add(new TObjString("TARGET"),
-  	     new TObjString("target_"+target4+".geo.root"));
+  //detGeo.Add(new TObjString("TARGET"),
+  //	     new TObjString("target_"+target4+".geo.root"));
   //detGeo.Add(new TObjString("ALADIN"),        
   //     new TObjString("aladin_v13a.geo.root"));
   //detGeo.Add(new TObjString("GLAD"),          
@@ -90,9 +93,8 @@ Int_t r3bsim(){
   //detGeo.Add(new TObjString("CRYSTALBALL"),   
   //         new TObjString("cal_v13a.geo.root"));
   detGeo.Add(new TObjString("CALIFA"),        
-	     new TObjString("califa_10_v8.11.geo.root"));  //Barrel only
-  //new TObjString("califa_v13_811.geo.root"));
-             //new TObjString("califa_v5_707717.geo.root"));
+	     new TObjString("califa_15_v8.11_iPhos1.01.geo.root"));
+	     //new TObjString("califa_10_v8.11.geo.root"));
   //detGeo.Add(new TObjString("TOF"),           
   //     new TObjString("tof_v13a.geo.root"));
   //detGeo.Add(new TObjString("MTOF"),          
@@ -121,24 +123,20 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 2000;
+   Int_t nEvents = 100;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
    //-------------------------------------------------
    //   connected:              kTRUE
    //   not connected:          kFALSE
-   Bool_t fEventDisplay=kTRUE;
+   Bool_t fEventDisplay=kFALSE;
 
    // Magnet Field definition
    Bool_t fR3BMagnet = kFALSE;
 	
    // Including CaloHitFinder task (kFALSE by default)
-<<<<<<< .mine
-   Bool_t fCaloHitFinder = kTRUE;  //kTRUE; 
-=======
-   Bool_t fCaloHitFinder = kFALSE; 
->>>>>>> .r23610
+   Bool_t fCaloHitFinder = kTRUE; 
 
    Double_t fMeasCurrent = 1500.;
 
