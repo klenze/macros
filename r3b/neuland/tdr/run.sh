@@ -1,7 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Check arguments
+if [ -z "$1" ]; then
+    echo "Usage: ./run.sh operation [output directory]"
+    echo "Operations: simu digi reco eval"
+    exit
+fi
+OPERATION=${1}
 
 # Set output directory from script arguments or use default
-OUTDIR=${1:-output}
+OUTDIR=${2:-output}
 # Create a folder for root files, so this directory stays clean
 mkdir -p ${OUTDIR}
 
@@ -10,6 +18,9 @@ trap 'echo "Stopping..."; kill $(jobs -pr) 2>/dev/null; exit' SIGINT SIGTERM
 # Remove Junk on exit
 trap 'echo "Cleaning..."; rm -f calor.out; rm -f flukaerr.dat; rm -f gphysi.dat; rm -f core_dump*; exit' EXIT
 
+# Timing
+START=$(date +%s.%N)
+
 # Look, I know this takes a lot of getting used to.
 # - First, generate a list off all operations by expanding {l,i,s,t,s} or {r..anges}
 # - Pipe those to xargs via echo -e
@@ -17,14 +28,8 @@ trap 'echo "Cleaning..."; rm -f calor.out; rm -f flukaerr.dat; rm -f gphysi.dat;
 # - nice all heavyweight operation
 # - use a metric ton of ' and " to make sure root gets the process in the right format
 # - log output (enable extended bash regex via shopt -s extglob)
-
-START=$(date +%s.%N)
-echo -e "'calibr.C(\"${OUTDIR}\", "{1400,3500}", "{200,600}", 500, "{4,12,30}", 4)'\n" | xargs -I CMD --max-procs 32 bash -c 'C='"'"'CMD'"'"'; echo `date --rfc-3339=seconds` ${C} && shopt -s extglob; nice -n 19 root -l -q -b -e "gInterpreter->AddIncludePath(\"'${VMCWORKDIR}'/macros/r3b/\")" "${C}" &> '${OUTDIR}'/${C//+([^a-zA-Z0-9])/_}.log'
-#echo -e "'calibr.C(\"${OUTDIR}\", "{1400,3500}", "{200,600,1000}", 500, "{1..50}", 4)'\n" | xargs -I CMD --max-procs 32 bash -c 'C='"'"'CMD'"'"'; echo `date --rfc-3339=seconds` ${C} && shopt -s extglob; nice -n 19 root -l -q -b -e "gInterpreter->AddIncludePath(\"'${VMCWORKDIR}'/macros/r3b/\")" "${C}" &> '${OUTDIR}'/${C//+([^a-zA-Z0-9])/_}.log'
+echo -e "'run.C(\"${OPERATION}\", \"${OUTDIR}\", "{1400,3500}", 600, "{100,500}", "{15,30}", "{1..4}")'\n" | xargs -I CMD --max-procs 32 bash -c 'C='"'"'CMD'"'"'; echo `date --rfc-3339=seconds` ${C} && shopt -s extglob; nice -n 19 root -l -q -b "${C}" &> '${OUTDIR}'/${C//+([^a-zA-Z0-9])/_}.log'
 END=$(date +%s.%N)
 
 # Echo duration
 echo "$END - $START" | bc
-
-# Convert all pdfs
-cd ${OUTDIR} && mogrify -trim -density 200 -format png *.pdf

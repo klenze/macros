@@ -1,3 +1,27 @@
+void ConnectParFileToRuntimeDb(const TString parFile, FairRuntimeDb* rtdb)
+{
+    FairParRootFileIo* io = new FairParRootFileIo();
+    io->open(parFile);
+    rtdb->setFirstInput(io);
+    rtdb->setOutput(io);
+    rtdb->saveOutput();
+}
+
+void ConnectParFilesToRuntimeDb(const TString parFile, const TString secondInput, FairRuntimeDb* rtdb)
+{
+    FairParRootFileIo* io = new FairParRootFileIo();
+    io->open(parFile);
+
+    FairParRootFileIo* io2 = new FairParRootFileIo();
+    io2->open(secondInput);
+
+    rtdb->setFirstInput(io);
+    rtdb->setSecondInput(io2);
+
+    rtdb->setOutput(io);
+    rtdb->saveOutput();
+}
+
 class RunConfig
 {
   public:
@@ -13,10 +37,15 @@ class RunConfig
         , erel(erel_)
         , nDoublePlanes(nDoublePlanes_)
         , nNeutrons(nNeutrons_)
+        , nMax(4)
     {
     }
 
-    TString GetNeut() const { return TString::Format("4He_%dn_%dAMeV_%dkeV.dat", nNeutrons, energy, erel); }
+    TString GetNeut() const
+    {
+        // return TString::Format("%dSn_%dn_%dAMeV_%dkeV_noSn.dat", 132 - nNeutrons, nNeutrons, energy, erel);
+        return TString::Format("%dSn_%dn_%dAMeV_%dkeV.dat", 132 - nNeutrons, nNeutrons, energy, erel);
+    }
 
     TString GetGeom() const { return TString::Format("neuland_v2_%dcm_%ddp.geo.root", distance, nDoublePlanes); }
 
@@ -63,4 +92,5 @@ class RunConfig
     Int_t erel;
     Int_t nDoublePlanes;
     Int_t nNeutrons;
+    Int_t nMax;
 };
