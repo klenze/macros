@@ -14,13 +14,12 @@ energy = int(sys.argv[4])
 erel = int(sys.argv[5])
 
 file    = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV.digi.root"    % (distance, nDoublePlanes, nNeutrons, energy, erel)
-parfile = "output/%dcm_%ddp_600AMeV_500keV.neutroncuts.para.root" % (distance, nDoublePlanes)
-outfile = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV_cluster.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel)
+outfile = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV_npnip_spread.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel)
 
 tfile = ROOT.TFile.Open(file)
 
 
-canvas = ROOT.TCanvas("glcanvas", "", 5 * 300, 2 * 300)
+canvas = ROOT.TCanvas("glcanvas", "", 600, 600)
 ROOT.gStyle.SetOptStat(0)
 
 # reverse viridis (wrapping lists in numpy arrays works better with root)
@@ -36,30 +35,15 @@ blue = numpy.array([30. / 255., 96. / 255., 112. / 255., 114. / 255.,
 ROOT.TColor.CreateGradientColorTable(9, stops, red, green, blue, 255, 1)
 
 
-
-
-hist = tfile.Get("NeulandClusterMon/ClusterEToFVSTime")
+hist = tfile.Get("NeulandMCMon/fhNPNIPSrvsz")
 
 pad1 = ROOT.TPad("pad1", "", 0.0, 0.0, 1.0, 1.0)
-labels = ROOT.TLatex()
-pad1.Divide(3, 1)
-pad1.Draw()
-
-
-pad1.cd(1)
 pad1.SetLogz()
-hist.GetYaxis().SetRangeUser(50,150)
+
+hist.SetTitle("Spread of primary neutron interaction points")
+hist.GetYaxis().SetRangeUser(0,150)
+hist.GetXaxis().SetRangeUser(distance,distance+300)
 hist.Draw("colz")
-
-
-pad1.cd(2)
-px = hist.ProjectionX()
-px.Draw("colz")
-
-pad1.cd(3)
-py = hist.ProjectionY()
-py.Draw("colz")
-
 
 mlabels = ROOT.TLatex()
 mlabels.SetTextSize(0.07)
@@ -68,4 +52,4 @@ mlabels.DrawLatexNDC(0.89, 0.86, "%2dm, %ddp" % (distance/100, nDoublePlanes))
 
 canvas.SaveAs(outfile)
 
-#input("Press enter to continue...")
+input("Press enter to continue...")

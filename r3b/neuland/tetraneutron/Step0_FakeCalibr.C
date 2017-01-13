@@ -31,7 +31,7 @@ void SetCut(const UInt_t nNeutrons, const Double_t y0, const Double_t x1, const 
     cut->SetPoint(3, -1, y3);
 }
 
-void Step3_FakeCalibr(const TString parFile)
+void Step0_FakeCalibr(const TString parFile)
 {
     SetCut(0, 0, 0, 0, 0);
     SetCut(1, 0, 0, 0, 0);
