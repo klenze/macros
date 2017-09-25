@@ -3,15 +3,12 @@
 #include "TGeoManager.h"
 #include "TMath.h"
 
-
-
-
 // Create Matrix Unity
 TGeoRotation *fGlobalRot = new TGeoRotation();
 
 // Create a null translation
 TGeoTranslation *fGlobalTrans = new TGeoTranslation();
-fGlobalTrans->SetTranslation(0.0,0.0,0.0);
+//fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 TGeoRotation *fRefRot = NULL;
 
 TGeoManager*   gGeoMan           = NULL;
@@ -31,8 +28,9 @@ Double_t fZ = 0.;
 Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kTRUE;
 
+TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
 
-void create_startra_geo_S438(const char* geoTag)
+void create_startra_geo_v15(const char* geoTag)
 {
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
@@ -47,7 +45,7 @@ void create_startra_geo_S438(const char* geoTag)
 
 
   // -------   Geometry file name (output)   ----------------------------------
-  TString geoFileName = geoPath + "/geometry/startra_";
+  TString geoFileName = geoPath + "/geometry/startrack_";
   geoFileName = geoFileName + geoTag + ".geo.root";
   // --------------------------------------------------------------------------
 
@@ -117,8 +115,7 @@ void create_startra_geo_S438(const char* geoTag)
   gGeoManager->SetVisLevel(6);
 
 
-  //Double_t WorldHalfLength=24.813;
-  Double_t WorldHalfLength=25.;
+  Double_t WorldHalfLength=24.813;
   Double_t ShiftToWorldEdge=20;
 
   // StarTrack world (mother volume to have vacuum for Si tracker and air for CALIFA)  !!
@@ -129,22 +126,12 @@ void create_startra_geo_S438(const char* geoTag)
 					     26.,   // rmax 
 					     WorldHalfLength  // half length
 					    );
-   // Remove target area
-   // For Luiquid Hydrogene target 
-   /*
+   // Remove target area 
    TGeoShape *pSTaRTrackWorld_B =new TGeoTube("STarTrack_Tube_B",
 					     0.,   // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
 					    //1.,  // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
 					     3.5250,  // rmax 
 					     6     // half length
-					    );
-   */
-   //for CH2 target
-   TGeoShape *pSTaRTrackWorld_B =new TGeoTube("STarTrack_Tube_B",
-					     0.,   // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
-					    //1.,  // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
-					     1.,  // rmax 
-					     0.58/2     // half length
 					    );
 
    //TGeoCombiTrans *t_targ=new TGeoCombiTrans("t_targ", 0.,0.,5-WorldHalfLength,fRefRot);
@@ -187,9 +174,8 @@ void create_startra_geo_S438(const char* geoTag)
   //Double_t WidthMin1= 2.25;    // Max width of detector (cm)
   Double_t WidthMin1= 1.971;    // Max width of detector (cm) as final specs
   Double_t Thickness1= 0.005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
-  //Double_t Thickness1= 0.0005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
   //Double_t Thickness1= 0.015;  // Half thickness of detector (cm)   -> total thickness: 300um
-  Double_t Length1=21.794+0.015;      // length of detector (cm) as final specs ( +150um to count for the gap between sensor)
+  Double_t Length1=21.794;      // length of detector (cm) as final specs
   //Double_t Length1=19.03;      // length of detector (cm
   //Double_t InclAng1=14.9;      // angle d'inclinaison with respect to z axis (deg)
   Double_t InclAng1=14.3;      // angle d'inclinaison with respect to z axis (deg)  As final specs
@@ -207,13 +193,13 @@ void create_startra_geo_S438(const char* geoTag)
   Double_t WidthMin2= 1.1406;     // Max width of detector (cm)  as final specs
   Double_t Thickness2= 0.015;  // half thickness of detector (cm)
   //Double_t Length2=30.6;       // length of detector (cm
-  Double_t Length2=33.83875 + 2*0.015;       // length of detector (cm) as final specs  ( + 2*150um to count for the gap between sensor)
+  Double_t Length2=33.83875;       // length of detector (cm) as final specs
   //Double_t InclAng2=33.7;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked
   Double_t InclAng2=32.155;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked
   //Double_t Rmin2=2.5;        // beam clearance 3cm radius
   Double_t Rmin2=2.22;        // beam clearance 3cm radius as final specs
   //Double_t AngRangeMin2=7.;    // Min theta angle covered (deg)
-  Double_t AngRangeMin2=5.306;    // Min theta angle covered (deg) as final specs
+  Double_t AngRangeMin2=5.3;    // Min theta angle covered (deg) as final specs
   //   Double_t AngTrap2=atan((WidthMax2 /2 - WidthMin2 /2)/Length2); // (rad)
   //   Double_t WidthHalf2= WidthMax2 - (Length2*tan(AngTrap2)); // width of detector at Length/2
   
@@ -224,13 +210,13 @@ void create_startra_geo_S438(const char* geoTag)
   Double_t WidthMin3= 1.1406;     // Max width of detector (cm) as final specs
   Double_t Thickness3= 0.015;  // half thickness of detector (cm)
   //Double_t Length3=30.6;       // length of detector (cm
-  Double_t Length3=33.83875 + 2*0.015;       // length of detector (cm) as final specs  ( + 2*150um to count for the gap between sensor)
+  Double_t Length3=33.83875;       // length of detector (cm) as final specs
   //Double_t InclAng3=33.7;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked !!
   Double_t InclAng3=32.155;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked !!
   //Double_t Rmin3=2.685;          // beam clearance 3cm radius
   Double_t Rmin3=2.95;          // beam clearance 3cm radius as final specs
   //Double_t AngRangeMin3=7;     // Min theta angle covered (deg)
-  Double_t AngRangeMin3=6.7657;     // Min theta angle covered (deg) as final specs
+  Double_t AngRangeMin3=6.76;     // Min theta angle covered (deg) as final specs
   //   Double_t AngTrap3=atan((WidthMax3 /2 - WidthMin3 /2)/Length2); // (rad)
   //   Double_t WidthHalf3= WidthMax3 - (Length3*tan(AngTrap3)); // width of detector at Length/2
   
@@ -1722,7 +1708,7 @@ void create_startra_geo_S438(const char* geoTag)
   
   // Inner layer
   
-  /*  
+  
   //STaRTraLog1->SetLineColor(kRed);
   STaRTraLog1->SetLineColor(40);
   
@@ -1741,13 +1727,13 @@ void create_startra_geo_S438(const char* geoTag)
   aTraFrame->AddNode(STaRTraCBFrameLog1,4, pMatrix8b);
   aTraFrame->AddNode(STaRTraCBFrameLog1,5, pMatrix10b);
   aTraFrame->AddNode(STaRTraCBFrameLog1,6, pMatrix12b);
-  */
+  
   
   // Middle layer:
   
   //STaRTraLog2->SetLineColor(kBlue);
   STaRTraLog2->SetLineColor(40);
-  /* 
+  
   aTra->AddNode(STaRTraLog2,7, pMatrix34);
   aTra->AddNode(STaRTraLog2,8, pMatrix36);
   aTra->AddNode(STaRTraLog2,9, pMatrix38);
@@ -1759,12 +1745,10 @@ void create_startra_geo_S438(const char* geoTag)
   aTra->AddNode(STaRTraLog2,15, pMatrix50);
   aTra->AddNode(STaRTraLog2,16, pMatrix52);
   aTra->AddNode(STaRTraLog2,17, pMatrix54);
-  */
   aTra->AddNode(STaRTraLog2,18, pMatrix56);
   
   STaRTraCBFrameLog2->SetLineColor(41);
-
-  /*
+  
   aTraFrame->AddNode(STaRTraCBFrameLog2,7, pMatrix34b);
   aTraFrame->AddNode(STaRTraCBFrameLog2,8, pMatrix36b);
   aTraFrame->AddNode(STaRTraCBFrameLog2,9, pMatrix38b);
@@ -1776,16 +1760,15 @@ void create_startra_geo_S438(const char* geoTag)
   aTraFrame->AddNode(STaRTraCBFrameLog2,15, pMatrix50b);
   aTraFrame->AddNode(STaRTraCBFrameLog2,16, pMatrix52b);
   aTraFrame->AddNode(STaRTraCBFrameLog2,17, pMatrix54b);
-  */
   aTraFrame->AddNode(STaRTraCBFrameLog2,18, pMatrix56b);
-   
+  
   
   
   // Outer layer:
   
   //STaRTraLog3->SetLineColor(kWhite);
   STaRTraLog3->SetLineColor(40);
-  /* 
+  
   aTra->AddNode(STaRTraLog3,19, pMatrix66);
   aTra->AddNode(STaRTraLog3,20, pMatrix68);
   aTra->AddNode(STaRTraLog3,21, pMatrix70);
@@ -1798,7 +1781,6 @@ void create_startra_geo_S438(const char* geoTag)
   aTra->AddNode(STaRTraLog3,28, pMatrix84);
   aTra->AddNode(STaRTraLog3,29, pMatrix86);
   aTra->AddNode(STaRTraLog3,30, pMatrix88);
-  */
 
   STaRTraCBFrameLog3->SetLineColor(41);
   
@@ -1853,7 +1835,8 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
     Double_t yAxis[3] = { 0. , 1. , 0. };
     Double_t zAxis[3] = { 0. , 0. , 1. };
     // Reference Rotation
-    fRefRot = fRef;
+    //fRefRot = fRef;
+    fRefRot = fRef->GetRotation();
     
     if (fRefRot) {
       Double_t mX[3] = {0.,0.,0.};
@@ -1910,7 +1893,8 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
       TGeoCombiTrans c3;
       c3.SetRotation(pTmp->GetRotation());
       TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot->GetRotation());
+      //c4.SetRotation(fRefRot->GetRotation());
+      c4.SetRotation(fRefRot);
       
       TGeoCombiTrans ccc = c3 * c4;
       

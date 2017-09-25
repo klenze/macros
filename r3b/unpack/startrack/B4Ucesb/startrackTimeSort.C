@@ -1,3 +1,6 @@
+///
+/////////// OBSOLETE /////////////////////
+///
 //
 //  Read the RAW output tree from StarTracker in R3Broot and order the data in time
 //  to produce a ordered raw output tree.

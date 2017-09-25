@@ -1,6 +1,7 @@
 void run_sim()
 {
     TString transport = "TGeant4";
+    Bool_t userPList = kFALSE; // option for TGeant4
 
     TString outFile = "sim.root";
     TString parFile = "par.root";
@@ -11,10 +12,18 @@ void run_sim()
     TString generator1 = "box";
     TString generator2 = "ascii";
     TString generator3 = "r3b";
-    TString generator = generator1;
-    TString inputFile = "";
+    //    TString generator4 = "p2p";  // use ASCII instead !!
+    TString generator = generator2;
+    //    TString inputFile = "";
+    //TString inputFile = "";
+    //TString inputFile = "quasi_elastic_400MeVA_12C_p_2p_sigma165.out"; // with generator4
+    //TString inputFile = "p2p/build/quasi_ascii.out";
+    //TString inputFile = "p2p/outputs/quasi_ascii_48Cap2p_250MeVA.out";
+      TString inputFile = "p2p/outputs/quasi_ascii_48Cap2p_400MeVA.out";
+    //TString inputFile = "p2p/outputs/quasi_ascii_48Cap2p_800MeVA.out";
 
-    Int_t nEvents = 1;
+    //Int_t nEvents = 10000;
+    Int_t nEvents = 10;
     Bool_t storeTrajectories = kTRUE;
     Int_t randomSeed = 335566; // 0 for time-dependent random numbers
 
@@ -43,6 +52,13 @@ void run_sim()
     run->SetOutputFile(outFile.Data()); // Output file
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
+    //  R3B Special Physics List in G4 case
+    if ((userPList == kTRUE) && (transport.CompareTo("TGeant4") == 0))
+    {
+        run->SetUserConfig("g4R3bConfig.C");
+        run->SetUserCuts("SetR3BCuts.C");
+    }
+
     // -----   Create media   -------------------------------------------------
     run->SetMaterials("media_r3b.geo"); // Materials
 
@@ -50,59 +66,62 @@ void run_sim()
     // R3B Cave definition
     FairModule* cave = new R3BCave("CAVE");
     cave->SetGeometryFileName("r3b_cave.geo");
+    //cave->SetGeometryFileName("r3b_cave_vacuum.geo");
     run->AddModule(cave);
 
     // To skip the detector comment out the line with: run->AddModule(...
 
     // Target
+    //run->AddModule(new R3BTarget(targetType.Data(), "target_" + targetType + ".geo.root", 0., 0., 0.));
     run->AddModule(new R3BTarget(targetType, "target_" + targetType + ".geo.root"));
 
     // GLAD
-    run->AddModule(new R3BGladMagnet("glad_v17_flange.geo.root")); // GLAD should not be moved or rotated
+    //run->AddModule(
+    //    new R3BGladMagnet("GladMagnet", "glad_v13a.geo.root", "R3BGlad Magnet")); // GLAD should not be moved or rotated
 
     // PSP
-    run->AddModule(new R3BPsp("psp_v13a.geo.root", {}, -221., -89., 94.1));
+    //run->AddModule(new R3BPsp(
+    //    "Psp", "psp_v13a.geo.root", kTRUE, 0., 0., 0., 0., 0., 0., -221., -89., 94.1)); // position, rotation, z1, z2,
+                                                                                        // z3
 
     // R3B SiTracker Cooling definition
-    run->AddModule(new R3BVacVesselCool(targetType, "vacvessel_v14a.geo.root"));
+    //run->AddModule(new R3BVacVesselCool(targetType.Data(), "vacvessel_v14a.geo.root", 0., 0., 0.));
+    //run->AddModule(new R3BVacVesselCool(targetType, "vacvessel_v14a.geo.root"));
 
     // STaRTrack
+    //run->AddModule(new R3BSTaRTra("STaRTrack", "startrack_v16-100_2layers.geo.root", kTRUE, 0., 0., 20.));
+    //run->AddModule(new R3BSTaRTra("STaRTrack", "startrack_v16-300_2layers.geo.root", kTRUE, 0., 0., 20.));
+    //run->AddModule(new R3BSTaRTra("startrack_v16-300_2layers.geo.root", { 0., 0., 20. }));
     run->AddModule(new R3BStartrack("startrack_v16-300_2layers.geo.root", { 0., 0., 20. }));
-    //run->AddModule(new R3BSTaRTra("startra_v16-300_2layers.geo.root", { 0., 0., 20. }));
+
 
     // CALIFA
-    R3BCalifa* califa = new R3BCalifa("califa_10_v8.11.geo.root");
-    califa->SelectGeometryVersion(10);
+    //R3BCalo* calo = new R3BCalo("Califa", "califa_10_v8.11.geo.root", kTRUE, 0., 0., 0.);
+    //R3BCalifa* califa = new R3BCalifa("califa_10_v8.11.geo.root");
     // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    califa->SetNonUniformity(1.0);
-    run->AddModule(califa);
-    
-    // Fi4 detector
-    run->AddModule(new R3BFi4("fi4_v17a.geo.root", {-73.274339-TMath::Tan(TMath::DegToRad()*16.7)*100, 0.069976, 513.649524+100.}, {"" ,-90.,16.7,90.}));
-
-    // Fi6 detector
-    run->AddModule(new R3BFi6("fi6_v17a.geo.root", {-73.274339-TMath::Tan(TMath::DegToRad()*16.7)*500, 0.069976, 513.649524+500.}, {"" ,-90.,16.7,90.}));
-
-    // Fi5 detector
-    run->AddModule(new R3BFi5("fi5_v17a.geo.root", {-73.274339-TMath::Tan(TMath::DegToRad()*16.7)*300, 0.069976, 513.649524+300.}, {"" ,-90.,16.7,90.}));
-
-    // sfi detector
-    run->AddModule(new R3Bsfi("sfi_v17a.geo.root", {0, 0, -200}));
+    //califa->SetNonUniformity(1.0);
+    //run->AddModule(califa);
 
     // Tof
-    run->AddModule(new R3BTof("tof_v17a.geo.root", { -417.359574, 2.400000, 960.777114 }, { "", -90., +31., 90. }));
+    //run->AddModule(new R3BTof("Tof", "tof_v17a.geo.root", kTRUE, -417.359574, 2.400000, 960.777114, 0., -31., 0.));
+    //run->AddModule(new R3BTof("tof_v17a.geo.root", { -417.359574, 2.400000, 960.777114 }, { "", -90., +31., 90. }));
 
-    // dTof
-    run->AddModule(new R3BdTof("dtof_v17a.geo.root", { -155.824045+(2.7*10)*TMath::Cos(16.7*TMath::DegToRad()), 0.523976, 761.870346 }, { "", -90., +16.7, 90. }));
+    // mTof
+    //run->AddModule(new R3BmTof("mTof", "mtof_v17a.geo.root", kTRUE, -155.824045, 0.523976, 761.870346, 0., -16.7, 0.));
+    //run->AddModule(new R3BmTof("mtof_v17a.geo.root", { -155.824045, 0.523976, 761.870346 }, { "", -90., +16.7, 90. }));
+
+    // MFI
+    //run->AddModule(new R3BMfi("Mfi", "mfi_v17a.geo.root", kTRUE, -63.82, 0., 520.25, 0., -13.5, 0.)); // s412
 
     // NeuLAND
-    // run->AddModule(new R3BNeuland("neuland_test.geo.root", { 0., 0., 1400. + 12 * 5. }));
+    //run->AddModule(new R3BLand("Land", "neuland_v12a_14m.geo.root", kTRUE, 0., 0., 1550.));
 
     // -----   Create R3B  magnetic field ----------------------------------------
     // NB: <D.B>
     // If the Global Position of the Magnet is changed
     // the Field Map has to be transformed accordingly
     R3BGladFieldMap* magField = new R3BGladFieldMap("R3BGladMap");
+//    magField->SetPosition(0., 0., +350 - 119.94);
     magField->SetScale(fieldScale);
 
     if (magnet == kTRUE)
@@ -122,14 +141,14 @@ void run_sim()
     {
         // 2- Define the BOX generator
         Int_t pdgId = 2212;     // proton beam
-        Double32_t theta1 = 0.; // polar angle distribution
-        Double32_t theta2 = 2.;
+        Double32_t theta1 = 10.; // polar angle distribution
+        Double32_t theta2 = 12.;
         Double32_t momentum = 1.5;
         FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 3);
         boxGen->SetThetaRange(theta1, theta2);
         boxGen->SetPRange(momentum, momentum * 1.2);
         boxGen->SetPhiRange(0, 360);
-        boxGen->SetXYZ(0.0, 0.0, -1.5);
+        boxGen->SetXYZ(0.0, 0.0, 0.0);
         primGen->AddGenerator(boxGen);
 
         // 128-Sn fragment
@@ -152,6 +171,14 @@ void run_sim()
         primGen->AddGenerator(gen);
     }
 
+    /*
+    if (generator.CompareTo("p2p") == 0)
+    {
+        R3Bp2pGenerator* P2Pgen = new R3Bp2pGenerator((dir + "/input/" + inputFile).Data());
+        primGen->AddGenerator(P2Pgen);
+    }
+    */
+    
     if (generator.CompareTo("r3b") == 0)
     {
         Int_t pdg = 2212;
@@ -174,7 +201,7 @@ void run_sim()
         // R3bGen Parameters
         pR3bGen->SetSigmaBeamEnergy(1.e-03); // Sigma(Ebeam) GeV
         pR3bGen->SetEnergyPrim(0.3);         // Particle Energy in MeV
-        Int_t fMultiplicity = 50;
+        Int_t fMultiplicity = 1;
         pR3bGen->SetNumberOfParticles(fMultiplicity); // Mult.
 
         // Reaction type
@@ -212,11 +239,15 @@ void run_sim()
 
     // -----   Initialize simulation run   ------------------------------------
     run->Init();
+    //gMC->SetRandom(new TRandom3(randomSeed));
     TVirtualMC::GetMC()->SetRandom(new TRandom3(randomSeed));
 
     // ------  Increase nb of step for CALO
     Int_t nSteps = -15000;
+    //gMC->SetMaxNStep(nSteps);
     TVirtualMC::GetMC()->SetMaxNStep(nSteps);
+
+
 
     // -----   Runtime database   ---------------------------------------------
     R3BFieldPar* fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
@@ -250,15 +281,4 @@ void run_sim()
 
     cout << " Test passed" << endl;
     cout << " All ok " << endl;
-
-    // Snap a picture of the geometry
-    // If this crashes, set "OpenGL.SavePicturesViaFBO: no" in your .rootrc
-    /*gStyle->SetCanvasPreferGL(kTRUE);
-    gGeoManager->GetTopVolume()->Draw("ogl");
-    TGLViewer* v = (TGLViewer*)gPad->GetViewer3D();
-    v->SetStyle(TGLRnrCtx::kOutline);
-    v->RequestDraw();
-    v->SavePicture("run_sim-side.png");
-    v->SetPerspectiveCamera(TGLViewer::kCameraPerspXOZ, 25., 0, 0, -90. * TMath::DegToRad(), 0. * TMath::DegToRad());
-    v->SavePicture("run_sim-top.png");*/
 }

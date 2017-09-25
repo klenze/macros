@@ -3,20 +3,17 @@
 #include "TGeoManager.h"
 #include "TMath.h"
 
-
-
-
 // Create Matrix Unity
 TGeoRotation *fGlobalRot = new TGeoRotation();
 
 // Create a null translation
-TGeoTranslation *fGlobalTrans = new TGeoTranslation();
-fGlobalTrans->SetTranslation(0.0,0.0,0.0);
+//TGeoTranslation *fGlobalTrans = new TGeoTranslation();
+TGeoTranslation *fGlobalTrans = NULL;
+//fGlobalTrans->SetTranslation(0.0,0.0,0.0);
+
 TGeoRotation *fRefRot = NULL;
 
 TGeoManager*   gGeoMan           = NULL;
-
-
 
 
 Double_t fThetaX = 0.;
@@ -31,8 +28,9 @@ Double_t fZ = 0.;
 Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kTRUE;
 
+TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
 
-void create_startra_geo_v16(const char* geoTag)
+void create_startrack_geo_v16_2layers(const char* geoTag)
 {
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
@@ -47,7 +45,7 @@ void create_startra_geo_v16(const char* geoTag)
 
 
   // -------   Geometry file name (output)   ----------------------------------
-  TString geoFileName = geoPath + "/geometry/startra_";
+  TString geoFileName = geoPath + "/geometry/startrack_";
   geoFileName = geoFileName + geoTag + ".geo.root";
   // --------------------------------------------------------------------------
 
@@ -149,12 +147,9 @@ void create_startra_geo_v16(const char* geoTag)
    TGeoCombiTrans *t0 = new TGeoCombiTrans("",0.,0.,ShiftToWorldEdge,fRefRot);
    TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
    
-   pTraWorld->SetLineColor(41);
-
    // add the sphere as Mother Volume
    pAWorld->AddNode(pTraWorld, 0, pGlobalc);
-
-  
+ 
    // All the other volumes:
 
   // out-of-file geometry definition
@@ -180,7 +175,6 @@ void create_startra_geo_v16(const char* geoTag)
   //Double_t WidthMin1= 2.25;    // Max width of detector (cm)
   Double_t WidthMin1= 1.971;    // Max width of detector (cm) as final specs
   Double_t Thickness1= 0.005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
-  //Double_t Thickness1= 0.0005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
   //Double_t Thickness1= 0.015;  // Half thickness of detector (cm)   -> total thickness: 300um
   Double_t Length1=21.794+0.015;      // length of detector (cm) as final specs ( +150um to count for the gap between sensor)
   //Double_t Length1=19.03;      // length of detector (cm
@@ -221,9 +215,9 @@ void create_startra_geo_v16(const char* geoTag)
   //Double_t InclAng3=33.7;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked !!
   Double_t InclAng3=32.155;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked !!
   //Double_t Rmin3=2.685;          // beam clearance 3cm radius
-  Double_t Rmin3=3.03196; //2.95;          // beam clearance 3cm radius as final specs
+  Double_t Rmin3=3.03196; // 2.95;          // beam clearance 3cm radius as final specs
   //Double_t AngRangeMin3=7;     // Min theta angle covered (deg)
-  Double_t AngRangeMin3=6.98815; //6.7657;     // Min theta angle covered (deg) as final specs
+  Double_t AngRangeMin3=6.98815; // 6.7657;     // Min theta angle covered (deg) as final specs
   //   Double_t AngTrap3=atan((WidthMax3 /2 - WidthMin3 /2)/Length2); // (rad)
   //   Double_t WidthHalf3= WidthMax3 - (Length3*tan(AngTrap3)); // width of detector at Length/2
   
@@ -761,9 +755,9 @@ void create_startra_geo_v16(const char* geoTag)
   //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(10*(360/NSide3 + ZRotAngleOL)*PI/180.)+sin(11*(360/NSide3 + ZRotAngleOL)*PI/180.));     // considering  real barycentre position;
   //dy =  dy +(WidthHalf3/2)*(sin(10*(360/NSide3 + ZRotAngleOL)*PI/180.) + sin(11*(360/NSide3 + ZRotAngleOL)*PI/180));      // considering  intersection of 2 medianes
   
-  dx=  -(((Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin((11*(360/NSide3) + ZRotAngleOL)*PI/180.);  // rotation by 330 deg/ z axis
-  dy=  -(((Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos((11*(360/NSide3) + ZRotAngleOL)*PI/180.);  // rotation by 330 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
+  dx=  -(((Length2)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin((11*(360/NSide3) + ZRotAngleOL)*PI/180.);  // rotation by 330 deg/ z axis
+  dy=  -(((Length2)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos((11*(360/NSide3) + ZRotAngleOL)*PI/180.);  // rotation by 330 deg/ z axis
+  dz = -Length2*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(11*360/NSide3 + ZRotAngleOL);
@@ -1396,9 +1390,7 @@ void create_startra_geo_v16(const char* geoTag)
   
   //   TGeoCombiTrans *t4 = new TGeoCombiTrans(tx,ty,tz,rotg);
   
- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
- ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////  
+  
    
   // STaRTracker
   
@@ -1757,8 +1749,7 @@ void create_startra_geo_v16(const char* geoTag)
   aTra->AddNode(STaRTraLog2,18, pMatrix56);
   
   STaRTraCBFrameLog2->SetLineColor(41);
-
-    
+  
   aTraFrame->AddNode(STaRTraCBFrameLog2,7, pMatrix34b);
   aTraFrame->AddNode(STaRTraCBFrameLog2,8, pMatrix36b);
   aTraFrame->AddNode(STaRTraCBFrameLog2,9, pMatrix38b);
@@ -1771,7 +1762,7 @@ void create_startra_geo_v16(const char* geoTag)
   aTraFrame->AddNode(STaRTraCBFrameLog2,16, pMatrix52b);
   aTraFrame->AddNode(STaRTraCBFrameLog2,17, pMatrix54b);
   aTraFrame->AddNode(STaRTraCBFrameLog2,18, pMatrix56b);
- 
+  
   
   
   // Outer layer:
@@ -1779,6 +1770,7 @@ void create_startra_geo_v16(const char* geoTag)
   //STaRTraLog3->SetLineColor(kWhite);
   STaRTraLog3->SetLineColor(40);
   
+  /*
   aTra->AddNode(STaRTraLog3,19, pMatrix66);
   aTra->AddNode(STaRTraLog3,20, pMatrix68);
   aTra->AddNode(STaRTraLog3,21, pMatrix70);
@@ -1806,7 +1798,7 @@ void create_startra_geo_v16(const char* geoTag)
   aTraFrame->AddNode(STaRTraCBFrameLog3,28, pMatrix84b);
   aTraFrame->AddNode(STaRTraCBFrameLog3,29, pMatrix86b);
   aTraFrame->AddNode(STaRTraCBFrameLog3,30, pMatrix88b);
- 
+  */
   
   pTraWorld->AddNode(aTra, 0, t1);  // when use a mother volume for Tracker
   pTraWorld->AddNode(aTraFrame, 0, t1);  // when use a mother volume for Tracker
@@ -1845,7 +1837,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
     Double_t yAxis[3] = { 0. , 1. , 0. };
     Double_t zAxis[3] = { 0. , 0. , 1. };
     // Reference Rotation
-    fRefRot = fRef;
+    fRefRot = fRef->GetRotation();
     
     if (fRefRot) {
       Double_t mX[3] = {0.,0.,0.};
@@ -1902,7 +1894,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
       TGeoCombiTrans c3;
       c3.SetRotation(pTmp->GetRotation());
       TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot->GetRotation());
+      c4.SetRotation(fRefRot);
       
       TGeoCombiTrans ccc = c3 * c4;
       
