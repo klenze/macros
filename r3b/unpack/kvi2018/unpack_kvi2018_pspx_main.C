@@ -20,7 +20,7 @@ extern "C" {
 
 typedef struct EXT_STR_h101_t
 {
-    EXT_STR_h101_LOS_onion_t los;
+//    EXT_STR_h101_LOS_onion_t los;
     EXT_STR_h101_unpack_t unpack;
     EXT_STR_h101_PSP_onion_t psp;
 } EXT_STR_h101;
@@ -37,10 +37,10 @@ void unpack_kvi2018_pspx_main(Int_t RunId = 17)
     TString filename;
     // TString lmddir;
     TString lmddir = "/u/syndikus/nyx/bloeher/data/kvi2018/lmd/";
-    if (RunId < 80)
+    if (RunId < 83)
     {
         // lmddir = "/data/land2/kvi2018/lmd/";
-        filename = Form(lmddir + "run%03d_*.lmd", RunId);
+        filename = Form(lmddir + "pspx_run%03d_*.lmd", RunId);
     }
     else
     {
@@ -50,11 +50,15 @@ void unpack_kvi2018_pspx_main(Int_t RunId = 17)
     TString outputFileName;
     // TString outdir = "/data/land3/kvi2018/rootfiles/";
     TString outdir = "/u/syndikus/rootfiles/kvi2018/";
-    if (RunId < 74)
+    if (RunId < 68)
     {
-        outputFileName = Form(outdir + "run%03d_pspx_mapped_precal_cal_calib_hit_default.root", RunId);
+        outputFileName = Form(outdir + "pspx_run%03d_mapped_precal_cal_calib_clean_hit_default.root", RunId);
     }
-    else
+    else if (RunId < 83)
+    {
+        outputFileName = Form(outdir + "pspx_run%03d_mapped_precal_cal_hit_default.root", RunId);
+    }
+    else 
     {
         outputFileName = Form(outdir + "run%03d_pspx_mapped_precal_cal_hit_default.root", RunId);
     }
@@ -65,17 +69,21 @@ void unpack_kvi2018_pspx_main(Int_t RunId = 17)
     TString ucesb_path;
     // TString upexps_dir = "/home/land/upexps/kvi2018/";
     TString upexps_dir = "/lynx/Lynx/land/usr/land/landexp/kvi2018/upexps/kvi2018/";
-    if (RunId == 73)
+    if (RunId<73)
+    {
+        ucesb_path = upexps_dir + "kvi2018_001_060 --allow-errors";
+    } 
+    else if (RunId == 73)
     {
         ucesb_path = upexps_dir + "kvi2018_pspx_073 --allow-errors";
     }
-    else if (RunId > 74)
+    else if (RunId > 74 && RunId<83)
     {
         ucesb_path = upexps_dir + "kvi2018_pspx_075_082 --allow-errors";
     }
     else
     {
-        ucesb_path = upexps_dir + "kvi2018_001_060 --allow-errors";
+        ucesb_path = upexps_dir + "kvi2018_069_101 --allow-errors";
     }
 
     // TString pspxpar_dir = "/home/land/R3BRoot_PSPX/psp/par/";

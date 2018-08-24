@@ -78,7 +78,7 @@ void unpack_kvi2018_pspx_alpha(Int_t window = 200, TString threshold = "cff")
     // Form("/data/land/kvi2018/rootfiles/source_notraces_pspx_mapped_precal_cal_calib_hit_default_win%d_" +
     // threshold + ".root", window);
     TString outputFileName =
-        Form("/u/syndikus/rootfiles/kvi2018/source_notraces_pspx_mapped_precal_cal_calib_hit_default_win%d_" +
+        Form("/u/syndikus/rootfiles/kvi2018/source_notraces_pspx_mapped_precal_cal_calib_clean_hit_default_win%d_" +
                  threshold + ".root",
              window);
 
@@ -92,7 +92,7 @@ void unpack_kvi2018_pspx_alpha(Int_t window = 200, TString threshold = "cff")
     TString pspxpar_dir = "/u/syndikus/R3BRoot/psp/par/";
     TString parPspxMappedFileName = "kvi2018_pspx_mapped.par";
     TString parPspxPrecalFileName = "kvi2018_pspx_precal_3126-9.par";
-    TString parPspxCalFileName = "kvi2018_pspx_cal_3126-9.par";
+    TString parPspxCalFileName = "kvi2018_pspx_cal_3126-9_alpha.par";
     TString parPspxHitFileName = "kvi2018_pspx_hit_default.par";
 
     EXT_STR_h101 ucesb_struct;
