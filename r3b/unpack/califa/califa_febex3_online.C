@@ -1,3 +1,14 @@
+/* Additional info:
+ * To generate the header file used for the R3BUcesbSource (ext_h101.h), use:
+ *
+ * ./201810_s444 --ntuple=RAW:SST,id=h101_CALIFA,ext_h101_califa.h
+ *
+ * at $UCESB_DIR/upexps/201810_s444
+ *
+ * Put this header file into the 'r3bsource' directory and recompile.
+ *
+ * @since October 23th, 2018
+ * */
 
 typedef struct EXT_STR_h101_t {
   EXT_STR_h101_unpack_t unpack;
@@ -8,21 +19,23 @@ typedef struct EXT_STR_h101_t {
 void califa_febex3_online(){
   TStopwatch timer;
   timer.Start();
-  
+
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   // Create source using ucesb for input ---------------------------------------
-  TString filename = "--stream=localhost";
+  TString filename = "--stream=lxg0898:6002";
+  //TString filename = "~/lmd/data_0001.lmd";
   TString outputFileName = "./data_online.root";
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
-  TString ucesb_path = ucesb_dir + "/../upexps/califaKrakow17/califa";
+  TString ucesb_path = ucesb_dir + "/../upexps/califa_s444/califa";
+
   EXT_STR_h101 ucesb_struct;
   
-  R3BUcesbSource* source = 
-    new R3BUcesbSource(filename, ntuple_options,
-		       ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
+  R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
+					      ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
   source->SetMaxEvents(nev);
+  
   source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
 					offsetof(EXT_STR_h101, unpack)));
   source->AddReader(new R3BCalifaFebexReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
@@ -30,10 +43,10 @@ void califa_febex3_online(){
   
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
-  run->SetRunId(1513078509);
   run->SetOutputFile(outputFileName);
-  run->ActivateHttpServer();
-  //run->SetAutoFinish(kFALSE);
+  Int_t refresh = 2000;
+  Int_t port=8044;
+  run->ActivateHttpServer(refresh,port);
   
   // Create analysis task ------------------------------------------------------
 
@@ -42,44 +55,35 @@ void califa_febex3_online(){
   run->AddTask(Map2Cal);
 
   // R3BOnlineSpectra ----------------------------------------------------------
-  Bool_t ON=true;
-  Int_t petals=2;
-  //Int_t crystalId=65;
-  
+  Int_t petals=7;
+  //
   R3BCalifaOnlineSpectra* online= new R3BCalifaOnlineSpectra();
-  online->SetDisplayCalOn(ON);
   online->SetPetals(petals);
-  online->SetCalifaConfigFile("/LynxOS/mbsusr/mbsdaq/Software/R3BRoot/macros/r3b/unpack/califa/CalifaPetal.txt");
-  // online->SetOneCrystal(crystalId);
   run->AddTask(online);
   
   // Initialize ----------------------------------------------------------------
-  //run->Init();
+  run->Init();
   FairLogger::GetLogger()->SetLogScreenLevel("INFO");
   
   // Runtime data base ---------------------------------------------------------
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   //Choose Root or Ascii file	
-  //1-Root file with the Calibartion Parameters  
-  //FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();//Ascii
-  //parIo1->open("Params.par","in");
-  FairParRootFileIo* parIo1 = new FairParRootFileIo();//Root
+  //1-Root file with the Calibartion Parameters
+  /*FairParRootFileIo* parIo1 = new FairParRootFileIo();
   parIo1->open("Califa_CalibParam.root","in");
   rtdb->setFirstInput(parIo1);
-  rtdb->print();
-  
+  */
   //2-Ascii file with the Calibartion Parameters
   /*FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
     parIo1->open("Califa_CalibParam.par","out");
     rtdb->setOutput(parIo1);
     rtdb->saveOutput();
-    rtdb->print();*/
+  */
   
-  // Run -----------------------------------------------------------------------
-  run->Init();
-  run->Run(nev, 0);
-  //rtdb->saveOutput();
-  delete run;
+
+  /* Run -------------------------------------------------- */
+  run->Run((nev < 0) ? nev : 0, (nev < 0) ? 0 : nev);
+
 
   timer.Stop();
   Double_t rtime = timer.RealTime();
@@ -89,4 +93,5 @@ void califa_febex3_online(){
   cout << "Output file is " << outputFileName << endl;
   cout << "Real time " << rtime << " s, CPU time " 
        << ctime << "s" << endl << endl;
+  //gApplication->Terminate();
 }
