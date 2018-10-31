@@ -211,8 +211,10 @@ void run_sim()
     FairLogger::GetLogger()->SetLogScreenLevel("INFO");
 
     // -----   Initialize simulation run   ------------------------------------
+    auto random = new TRandom3(randomSeed);
+    gRandom = random;
     run->Init();
-    TVirtualMC::GetMC()->SetRandom(new TRandom3(randomSeed));
+    TVirtualMC::GetMC()->SetRandom(random);
 
     // ------  Increase nb of step for CALO
     Int_t nSteps = -15000;
