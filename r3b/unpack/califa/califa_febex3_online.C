@@ -24,11 +24,11 @@ void califa_febex3_online(){
   
   // Create source using ucesb for input ---------------------------------------
   TString filename = "--stream=lxg0898:6002";
-  //TString filename = "~/lmd/data_0001.lmd";
+  //TString filename = "~/lmd/data_0010.lmd";
   TString outputFileName = "./data_online.root";
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
-  TString ucesb_path = ucesb_dir + "/../upexps/califa_s444/califa";
+  TString ucesb_path = ucesb_dir + "/../upexps/201810_s444/201810_s444";
 
   EXT_STR_h101 ucesb_struct;
   
@@ -38,8 +38,12 @@ void califa_febex3_online(){
   
   source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
 					offsetof(EXT_STR_h101, unpack)));
-  source->AddReader(new R3BCalifaFebexReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
-					     offsetof(EXT_STR_h101, califa)));
+
+  R3BCalifaFebexReader *unpackcalifa = new R3BCalifaFebexReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
+					     offsetof(EXT_STR_h101, califa));
+
+  unpackcalifa->SetOnline(true);
+  source->AddReader(unpackcalifa);
   
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
@@ -51,8 +55,8 @@ void califa_febex3_online(){
   // Create analysis task ------------------------------------------------------
 
   //R3BCalifaMapped2CrystalCal ---
-  R3BCalifaMapped2CrystalCal* Map2Cal = new R3BCalifaMapped2CrystalCal();
-  run->AddTask(Map2Cal);
+  //R3BCalifaMapped2CrystalCal* Map2Cal = new R3BCalifaMapped2CrystalCal();
+  //run->AddTask(Map2Cal);
 
   // R3BOnlineSpectra ----------------------------------------------------------
   Int_t petals=7;
