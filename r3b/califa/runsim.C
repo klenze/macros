@@ -21,7 +21,7 @@ void runsim(Int_t nEvents = 0)
 
   // ---------------  Detector selection: true - false -------------------------------
 
-  Bool_t  fTarget = true;            // Target
+  Bool_t  fTarget = false;            // Target
   TString fTargetType = "LiH";       // Target selection: LeadTarget, Para, Para45, LiH
 
   Bool_t  fVesselcool = false;       // SiTracker Cooling
@@ -37,12 +37,12 @@ void runsim(Int_t nEvents = 0)
   TString fXBallGeo = "cal_v13a.geo.root";
 
   Bool_t  fCalifa = true;           // Califa Calorimeter
-  TString fCalifaGeo = "califa_10_v8.11.geo.root";
+  TString fCalifaGeo = "califa_s444.geo.root";
   Int_t   fCalifaGeoVer = 10;
   Double_t fCalifaNonU = 1.0; //Non-uniformity: 1 means +-1% max deviation
 
-  Bool_t  fTracker = false;          // Tracker
-  TString fTrackerGeo = "tra_v13vac.geo.root";
+  Bool_t  fTracker = true;          // Tracker
+  TString fTrackerGeo = "ams_s444.geo.root";
 
   Bool_t  fStarTrack = false;        // STaR Tracker
   TString fStarTrackGeo = "startrack_v13a.geo.root";
