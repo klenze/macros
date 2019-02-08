@@ -1,11 +1,11 @@
 /* Additional info:
  * To generate the header file used for the R3BUcesbSource (ext_h101.h), use:
  *
- * ./201810_s444 --ntuple=RAW:SST,id=h101_CALIFA,ext_h101_califa.h
+ * ./201902_s444 --ntuple=RAW:CALIFA,id=h101_CALIFA,ext_h101_raw_califa_febex.h
  *
- * at $UCESB_DIR/upexps/201810_s444
+ * at $UCESB_DIR/upexps/201902_s444
  *
- * Put this header file into the 'r3bsource' directory and recompile.
+ * Put the header file into the 'r3bsource' directory and recompile.
  *
  * @since October 23th, 2018
  * */
@@ -16,26 +16,29 @@ typedef struct EXT_STR_h101_t {
 } EXT_STR_h101;
 
 
-void califa_febex3_online(){
+void califa_online(){
   TStopwatch timer;
   timer.Start();
 
-  auto t = std::time(nullptr);
-  auto tm = *std::localtime(&t);
+  //auto t = std::time(nullptr);
+  //auto tm = *std::localtime(&t);
   //std::cout << put_time(&tm, "%d_%m_%Y_%H_%M_%S") << std::endl;
 
-  std::ostringstream oss;
-  oss << std::put_time(&tm, "%d_%m_%Y_%H_%M_%S");
+  //std::ostringstream oss;
+  //oss << std::put_time(&tm, "%d_%m_%Y_%H_%M_%S");
 
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   // Create source using ucesb for input ---------------------------------------
   TString filename = "--stream=lxg0898:6002";
-  //TString filename = "~/lmd/data_0010.lmd";
-  TString outputFileName = "./data_online_" + oss.str() + ".root";
+  //TString filename = "~/lmd/data_0431.lmd";
+  //TString outputFileName = "./data_online_" + oss.str() + ".root";
+  TString outputFileName = "./data_online.root";
+
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
-  TString ucesb_path = ucesb_dir + "/../upexps/201810_s444/201810_s444";
+  TString ucesb_path = ucesb_dir + "/../upexps/201902_s444/201902_s444";
+  ucesb_path.ReplaceAll("//","/");
 
   EXT_STR_h101 ucesb_struct;
   
@@ -54,7 +57,9 @@ void califa_febex3_online(){
   
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
-  run->SetOutputFile(outputFileName);
+  //run->SetRunId(1);
+  //run->SetOutputFile(outputFileName);
+  run->SetSink(new FairRootFileSink(outputFileName));
   Int_t refresh = 2000;
   Int_t port=8044;
   run->ActivateHttpServer(refresh,port);
@@ -74,6 +79,8 @@ void califa_febex3_online(){
   
   // Initialize ----------------------------------------------------------------
   run->Init();
+  //    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+  //    FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
   FairLogger::GetLogger()->SetLogScreenLevel("INFO");
   
   // Runtime data base ---------------------------------------------------------

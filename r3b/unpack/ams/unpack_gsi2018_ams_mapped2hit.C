@@ -1,9 +1,9 @@
 /* Additional info:
  * To generate the header file used for the R3BUcesbSource (ext_h101.h), use:
  *
- * ./201810_s444 --ntuple=RAW:SST,id=h101_AMS,ext_h101_ams.h
+ * ./201902_s444 --ntuple=RAW:SST,id=h101_AMS,ext_h101_ams.h
  *
- * at $UCESB_DIR/upexps/201810_s444
+ * at $UCESB_DIR/upexps/201902_s444
  *
  * Put this header file into the 'r3bsource' directory and recompile.
  * */
@@ -27,9 +27,9 @@ void unpack_gsi2018_ams_mapped2hit() {
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
-  
-  TString ucesb_path = ucesb_dir + "/../upexps/201810_s444/201810_s444";
-  
+  TString ucesb_path = ucesb_dir + "/../upexps/201902_s444/201902_s444";
+  ucesb_path.ReplaceAll("//","/");
+
   EXT_STR_h101 ucesb_struct;
   
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
@@ -45,8 +45,8 @@ void unpack_gsi2018_ams_mapped2hit() {
   /* Create online run ------------------------------------ */
   FairRunOnline* run = new FairRunOnline(source);
   run->SetRunId(1);
-  run->SetOutputFile(outputFileName);
-  
+  run->SetSink(new FairRootFileSink(outputFileName));
+
 
   /* Runtime data base ------------------------------------ */
   FairRuntimeDb* rtdb = run->GetRuntimeDb();

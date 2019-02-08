@@ -1,19 +1,20 @@
 /* Additional info:
- * To generate the header file for a different number of febex modules,
- * add then in $UCESB_DIR/upexps/califalisbon16/califa.spec file and use:
+ * To generate the header file used for the R3BUcesbSource (ext_h101.h), use:
  *
- * $UCESB_DIR/upexps/califalisbon16/califa --ntuple=RAW,STRUCT_HH,ext_h101_raw_califa_febex.h
+ * ./201902_s444 --ntuple=RAW:CALIFA,id=h101_CALIFA,ext_h101_raw_califa_febex.h
  *
- * Put this header file into the 'r3bsource' directory and recompile
- * (present file is valid for 9 modules and 16 channels for module)
- * */
+ * at $UCESB_DIR/upexps/201902_s444
+ *
+ * Put the header file into the 'r3bsource' directory and recompile
+ *
+ */
 
 typedef struct EXT_STR_h101_t {
   EXT_STR_h101_unpack_t unpack;
   EXT_STR_h101_CALIFA_t califa;
 } EXT_STR_h101;
 
-void califa_febex3_unpack() {
+void califa_unpack() {
   TStopwatch timer;
   timer.Start();
   
@@ -21,14 +22,14 @@ void califa_febex3_unpack() {
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "/media/mbsdaq/extDisk/data/168_2018-06-07_12-38-32/data_0001.lmd";
-  TString outputFileName = "./dataMap_0001.root";
+  TString filename = "~/lmd/data_0001.lmd";
+  TString outputFileName = "./datamap_0001.root";
 
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
-  
-  TString ucesb_path = ucesb_dir + "/../upexps/califaKrakow17/califa";
-  
+  TString ucesb_path = ucesb_dir + "/../upexps/201902_s444/201902_s444";
+  ucesb_path.ReplaceAll("//","/");
+
   EXT_STR_h101 ucesb_struct;
   
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
@@ -39,36 +40,33 @@ void califa_febex3_unpack() {
 					offsetof(EXT_STR_h101, unpack)));
   source->AddReader(new R3BCalifaFebexReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
 					     offsetof(EXT_STR_h101, califa)));
-  /* ------------------------------------------------------ */
+
   
   /* Create online run ------------------------------------ */
   FairRunOnline* run = new FairRunOnline(source);
-  //run->SetRunId(1495624105);
-  run->SetRunId(1513078509);
-  run->SetOutputFile(outputFileName);
+  run->SetRunId(1);
+  run->SetSink(new FairRootFileSink(outputFileName));
+
   
   /* Add analysis task ------------------------------------ */
  
   
   /* Initialize ------------------------------------------- */
   run->Init();
+  //    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+  //    FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
   FairLogger::GetLogger()->SetLogScreenLevel("INFO");
-  /* ------------------------------------------------------ */
-  
+
+
   /* Runtime data base ------------------------------------ */
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  /*R3BFieldPar* fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
-    fieldPar->SetParameters(magField);
-    fieldPar->setChanged();*/
- 
-  /* ------------------------------------------------------ */
+
   
   /* Run -------------------------------------------------- */
-  run->Run(nev,0);
-  /*rtdb->saveOutput();*/
-  delete run;
-  /* ------------------------------------------------------ */
+  run->Run((nev < 0) ? nev : 0, (nev < 0) ? 0 : nev);
 
+
+  /* Finish ----------------------------------------------- */
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();
@@ -77,4 +75,5 @@ void califa_febex3_unpack() {
   cout << "Output file is " << outputFileName << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s"
        << endl << endl;
+  gApplication->Terminate();
 }

@@ -1,9 +1,9 @@
 /* Additional info:
  * To generate the header file used for the R3BUcesbSource (ext_h101.h), use:
  *
- * ./201810_s444 --ntuple=RAW:SST,id=h101_AMS,ext_h101_ams.h
+ * ./201902_s444 --ntuple=RAW:SST,id=h101_AMS,ext_h101_ams.h
  *
- * at $UCESB_DIR/upexps/201810_s444
+ * at $UCESB_DIR/upexps/201902_s444
  *
  * Put this header file into the 'r3bsource' directory and recompile.
  *
@@ -16,7 +16,7 @@ typedef struct EXT_STR_h101_t {
   EXT_STR_h101_AMS_t ams;
 } EXT_STR_h101;
 
-void unpack_gsi2018_ams_online() {
+void ams_online() {
   TStopwatch timer;
   timer.Start();
   
@@ -25,15 +25,15 @@ void unpack_gsi2018_ams_online() {
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "--stream=lxg0898:6002";
-  //TString filename = "/u/land/nyx/land/htoernqv/ams.lmd";
+  //TString filename = "--stream=lxg0898:6002";
+  TString filename = "~/lmd/ams_compressed_2019-02-06_15-11.lmd";
   
   TString outputFileName = "data_online.root";
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
-  
-  TString ucesb_path = ucesb_dir + "/../upexps/201810_s444/201810_s444";
+  TString ucesb_path = ucesb_dir + "/../upexps/201902_s444/201902_s444";
+  ucesb_path.ReplaceAll("//","/");
   
   EXT_STR_h101 ucesb_struct;
   
@@ -52,13 +52,14 @@ void unpack_gsi2018_ams_online() {
 
   /* Add readers ------------------------------------------ */
   source->AddReader(unpackreader);
+  unpackams->SetOnline(true);
   source->AddReader(unpackams);
 
   
   /* Create online run ------------------------------------ */
   FairRunOnline* run = new FairRunOnline(source);
   run->SetRunId(1);
-  run->SetOutputFile(outputFileName);
+  run->SetSink(new FairRootFileSink(outputFileName));
   Int_t refresh = 2000;
   Int_t port=8044;
   run->ActivateHttpServer(refresh, port);
