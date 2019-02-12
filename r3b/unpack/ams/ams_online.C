@@ -25,8 +25,8 @@ void ams_online() {
   
   /* Create source using ucesb for input ------------------ */
   
-  //TString filename = "--stream=lxg0898:6002";
-  TString filename = "~/lmd/ams_compressed_2019-02-06_15-11.lmd";
+  TString filename = "--stream=lxg0898:6002";
+  //TString filename = "~/lmd/ams_raw_2019-02-06_15-16.lmd";
   
   TString outputFileName = "data_online.root";
   

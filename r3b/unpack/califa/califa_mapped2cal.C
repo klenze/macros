@@ -22,9 +22,13 @@ void califa_mapped2cal() {
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   /* Create source using ucesb for input ------------------ */
-  TString filename = "~/lmd/data_0001.lmd";
+  TString filename = "--stream=lxg0898:6002";
+  //TString filename = "~/lmd/run_1550262804.lmd";
   TString outputFileName = "./datacal_0001.root";
 
+
+  /* Create source using ucesb for input ------------------ */
+  //UCESB paths
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
   TString ucesb_path = ucesb_dir + "/../upexps/201902_s444/201902_s444";

@@ -14,13 +14,14 @@ typedef struct EXT_STR_h101_t {
 void califa_ams_online() {
   TStopwatch timer;
   timer.Start();
+
   
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
 
   
   /* Input --------------------------------------- */
-  //TString filename = "--stream=lxg0898:6002";
-  TString filename = "~/lmd/ams_compressed_2019-02-06_15-11.lmd";
+  TString filename = "--stream=lxg0897:6002";
+  //TString filename = "~/lmd/344_2019-02-16_17-51-36/data_00*.lmd";
 
 
   /* Output --------------------------------------- */
@@ -29,15 +30,12 @@ void califa_ams_online() {
 
   /* Calibration files ---------------------------- */
   TString dir = gSystem->Getenv("VMCWORKDIR");
-  //CALIFA detector
-  TString califadir = dir + "/macros/r3b/unpack/califa/";
-  TString califacalfilename = califadir + "Califa_CalibParam.root";
-  califacalfilename.ReplaceAll("//","/");
-  //AMS detectors
-  TString amsdir = dir + "/macros/r3b/unpack/ams/";
-  TString amscalfilename = amsdir + "Ams_CalibParam.root";
-  amscalfilename.ReplaceAll("//","/");
+  //CALIFA and AMS detectors
+  TString califadir = dir + "/macros/r3b/unpack/califa_ams/";
+  TString calfilename = califadir + "Califa_Ams_CalibParamFeb20190218.root";
+  calfilename.ReplaceAll("//","/");
   
+
   /* Create source using ucesb for input ------------------ */
   //UCESB paths
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
@@ -76,7 +74,7 @@ void califa_ams_online() {
   run->SetRunId(1);
   run->SetSink(new FairRootFileSink(outputFileName));
   Int_t refresh = 2000;
-  Int_t port=8044;
+  Int_t port=8046;
   run->ActivateHttpServer(refresh, port);
 
 
@@ -85,31 +83,51 @@ void califa_ams_online() {
 
 
   /* Load parameters   ------------------------------------ */
-  //AMS detectors
+  //CALIFA and AMS detectors
   FairParRootFileIo* parIo1 = new FairParRootFileIo();
-  parIo1->open(amscalfilename,"in");
+  parIo1->open(calfilename,"in");
   rtdb->setFirstInput(parIo1);
-  rtdb->print();
+
+
+  //R3BCalifaMapped2CrystalCal ---
+  R3BCalifaMapped2CrystalCal* Map2CalCalifa = new R3BCalifaMapped2CrystalCal();
+  Map2CalCalifa->SetOnline(true);
+  run->AddTask(Map2CalCalifa);
+  //R3BCalifaCrystalCal2Hit ---
+  R3BCalifaCrystalCal2Hit* Cal2HitCalifa = new R3BCalifaCrystalCal2Hit();
+  Cal2HitCalifa->SelectGeometryVersion(444);
+  Cal2HitCalifa->SetClusteringAlgorithm(1,0);
+  Cal2HitCalifa->SetDetectionThreshold(200);     //200 KeV
+  Cal2HitCalifa->SetDRThreshold(15000);          //15 MeV
+  Cal2HitCalifa->SetExperimentalResolution(0.);  //6% at 1 MeV
+  //Cal2HitCalifa->SetComponentResolution(0.);   //sigma = 0.25 MeV
+  //Cal2HitCalifa->SetPhoswichResolution(3.,5.); //percent @ 1 MeV for LaBr and LaCl
+  Cal2HitCalifa->SetAngularWindow(0.25,0.25);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+  run->AddTask(Cal2HitCalifa);
 
 
   /* Add analysis tasks ----------------------------------- */  
-  R3BAmsMapped2StripCal* Map2Cal = new R3BAmsMapped2StripCal();
-  Map2Cal->SetOnline(true);
-  run->AddTask(Map2Cal);
-  R3BAmsStripCal2Hit* Cal2Hit = new R3BAmsStripCal2Hit();
-  Cal2Hit->SetOnline(true);
-  run->AddTask(Cal2Hit);
+  R3BAmsMapped2StripCal* Map2CalAms = new R3BAmsMapped2StripCal();
+  Map2CalAms->SetOnline(true);
+  run->AddTask(Map2CalAms);
+  R3BAmsStripCal2Hit* Cal2HitAms = new R3BAmsStripCal2Hit();
+  Cal2HitAms->SetOnline(true);
+  run->AddTask(Cal2HitAms);
 
 
   /* Add online tasks ------------------------------------- */
   //CALIFA detector
-  Int_t petals=7;
+  Int_t petals=8;
   R3BCalifaOnlineSpectra* CalifaOnline= new R3BCalifaOnlineSpectra();
   CalifaOnline->SetPetals(petals);
+  CalifaOnline->SetRange_max(100000);//100MeV
   run->AddTask(CalifaOnline);
   //AMS detectors
   R3BAmsOnlineSpectra* AmsOnline= new R3BAmsOnlineSpectra();
   run->AddTask(AmsOnline);
+  //AMS and CALIFA correlations
+  R3BAmsCalifaCorrelatedOnlineSpectra* AmsCalifaOnline= new R3BAmsCalifaCorrelatedOnlineSpectra();
+  run->AddTask(AmsCalifaOnline);
 
 
   /* Initialize ------------------------------------------- */

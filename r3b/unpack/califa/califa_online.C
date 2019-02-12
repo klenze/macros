@@ -20,21 +20,19 @@ void califa_online(){
   TStopwatch timer;
   timer.Start();
 
-  //auto t = std::time(nullptr);
-  //auto tm = *std::localtime(&t);
-  //std::cout << put_time(&tm, "%d_%m_%Y_%H_%M_%S") << std::endl;
-
-  //std::ostringstream oss;
-  //oss << std::put_time(&tm, "%d_%m_%Y_%H_%M_%S");
-
-  const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
+  const Int_t nev = 1; /* number of events to read, -1 - until CTRL+C */
   
   // Create source using ucesb for input ---------------------------------------
   TString filename = "--stream=lxg0898:6002";
-  //TString filename = "~/lmd/data_0431.lmd";
-  //TString outputFileName = "./data_online_" + oss.str() + ".root";
+  //TString filename = "~/lmd/run_155026280*.lmd";
+
+
+  /* Output --------------------------------------- */
   TString outputFileName = "./data_online.root";
 
+
+  /* Create source using ucesb for input ------------------ */
+  //UCESB paths
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
   TString ucesb_path = ucesb_dir + "/../upexps/201902_s444/201902_s444";
@@ -57,40 +55,23 @@ void califa_online(){
   
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
-  //run->SetRunId(1);
-  //run->SetOutputFile(outputFileName);
+  run->SetRunId(1);
   run->SetSink(new FairRootFileSink(outputFileName));
   Int_t refresh = 2000;
-  Int_t port=8044;
+  Int_t port=8045;
   run->ActivateHttpServer(refresh,port);
-  
-  // Create analysis task ------------------------------------------------------
 
-  //R3BCalifaMapped2CrystalCal ---
-  //R3BCalifaMapped2CrystalCal* Map2Cal = new R3BCalifaMapped2CrystalCal();
-  //run->AddTask(Map2Cal);
 
-  // R3BOnlineSpectra ----------------------------------------------------------
-  Int_t petals=7;
-  //
-  R3BCalifaOnlineSpectra* online= new R3BCalifaOnlineSpectra();
-  online->SetPetals(petals);
-  run->AddTask(online);
-  
-  // Initialize ----------------------------------------------------------------
-  run->Init();
-  //    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
-  //    FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
-  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
-  
   // Runtime data base ---------------------------------------------------------
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
+
+
+  /* Load parameters   ------------------------------------ */ 
   //Choose Root or Ascii file	
   //1-Root file with the Calibartion Parameters
-  /*FairParRootFileIo* parIo1 = new FairParRootFileIo();
-  parIo1->open("Califa_CalibParam.root","in");
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
+  parIo1->open("Califa_CalibParamFeb2019.root","in");
   rtdb->setFirstInput(parIo1);
-  */
   //2-Ascii file with the Calibartion Parameters
   /*FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
     parIo1->open("Califa_CalibParam.par","out");
@@ -98,6 +79,26 @@ void califa_online(){
     rtdb->saveOutput();
   */
   
+
+  // Create analysis task ------------------------------------------------------
+  //R3BCalifaMapped2CrystalCal ---
+  R3BCalifaMapped2CrystalCal* Map2Cal = new R3BCalifaMapped2CrystalCal();
+  run->AddTask(Map2Cal);
+
+  // R3BOnlineSpectra ----------------------------------------------------------
+  Int_t petals=8;
+  //
+  R3BCalifaOnlineSpectra* online= new R3BCalifaOnlineSpectra();
+  online->SetPetals(petals);
+  run->AddTask(online);
+
+
+  // Initialize ----------------------------------------------------------------
+  run->Init();
+  //    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+  //    FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
+  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+
 
   /* Run -------------------------------------------------- */
   run->Run((nev < 0) ? nev : 0, (nev < 0) ? 0 : nev);

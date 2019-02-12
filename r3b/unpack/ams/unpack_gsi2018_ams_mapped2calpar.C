@@ -21,8 +21,8 @@ void unpack_gsi2018_ams_mapped2calpar() {
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   /* Create source using ucesb for input ------------------ */
-  
-  TString filename = "~/lmd/ams_compressed_2019-02-06_15-11.lmd";
+  TString filename = "--stream=lxg0898:6002";
+  //TString filename = "~/lmd/ams_compressed_2019-02-11_11-22.lmd";
   TString outputFileName = "datacalpar_0001.root";
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
@@ -54,11 +54,12 @@ void unpack_gsi2018_ams_mapped2calpar() {
   CalPar->SetNumStrips(1024); // 1024 strips per ams detector
   CalPar->SetNumStripsK(384); // 384 strips for the K-side
   CalPar->SetNumStripsS(640); // 640 strips for the S-side
-  CalPar->SetMaxSigma(20);     // Max. sigma to mark dead strips: 5 ADC units
+  CalPar->SetMaxSigma(10);    // Max. sigma to mark dead strips: 5 ADC units
   CalPar->SetMinStadistics(1000);
   CalPar->SetCalRange_left(0);  
   CalPar->SetCalRange_right(4000);
   CalPar->SetCalRange_bins(4000);
+  CalPar->SetPrintParamsDaq(kTRUE);
   run->AddTask(CalPar);
 
 
