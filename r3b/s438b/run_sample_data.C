@@ -2,7 +2,7 @@
 typedef struct EXT_STR_h101_t
 {
     EXT_STR_h101_unpack_t unpack;
-    EXT_STR_h101_raw_nnp_onion_t nnp;
+    EXT_STR_h101_raw_nnp_tacquila_onion_t nnp;
 } EXT_STR_h101;
 
 void run_sample_data()
@@ -31,7 +31,7 @@ void run_sample_data()
     R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options, ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
     source->SetMaxEvents(nev);
     source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct.unpack, offsetof(EXT_STR_h101, unpack)));
-    source->AddReader(new R3BNeulandTacquilaReader((EXT_STR_h101_raw_nnp*)&ucesb_struct.nnp, offsetof(EXT_STR_h101, nnp)));
+    source->AddReader(new R3BNeulandTacquilaReader((EXT_STR_h101_raw_nnp_tacquila*)&ucesb_struct.nnp, offsetof(EXT_STR_h101, nnp)));
     // ---------------------------------------------------------------------------
 
     // Create online run ---------------------------------------------------------
@@ -49,7 +49,7 @@ void run_sample_data()
     // ---------------------------------------------------------------------------
 
     // TCAL ----------------------------------------------------------------------
-    R3BNeulandMapped2CalPar* tcalFill = new R3BNeulandMapped2CalPar("TcalFill");
+    R3BNeulandTacquilaMapped2CalPar* tcalFill = new R3BNeulandTacquilaMapped2CalPar("TcalFill");
     tcalFill->SetUpdateRate(updateRate);
     tcalFill->SetMinStats(minStats);
     tcalFill->SetTrigger(trigger);
