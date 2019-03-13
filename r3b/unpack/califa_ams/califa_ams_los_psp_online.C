@@ -6,14 +6,6 @@
  * */
 
 using namespace std;
-extern "C" {
-        #include "/home/joseluis/r3broot/r3bsource/ext_h101_unpack.h"
-	#include "/home/joseluis/r3broot/r3bsource/ext_h101_los_tamex.h"
-        #include "/home/joseluis/r3broot/r3bsource/ext_h101_raw_califa_febex.h"
-        #include "/home/joseluis/r3broot/r3bsource/ext_h101_ams.h"
-        #include "/home/joseluis/r3broot/r3bsource/ext_h101_psp.h"
-}
-
 typedef struct EXT_STR_h101_t {
   EXT_STR_h101_unpack_t unpack;
   EXT_STR_h101_CALIFA_t califa;
@@ -31,7 +23,7 @@ void califa_ams_los_psp_online() {
 
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
 
-  Int_t expId = 444; //select: 444 or 473
+  const Int_t expId = 444; //select: 444 or 473
   Bool_t los_in  = true;
   Bool_t psp_in  = false;
 
@@ -77,11 +69,12 @@ void califa_ams_los_psp_online() {
   ucesb_path.ReplaceAll("//","/");
 
 
+  /* Definition of Ucesb --------------------------------- */
+
   EXT_STR_h101 ucesb_struct;
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
 					      ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
   source->SetMaxEvents(nev);
-  
 
   /* Definition of reader --------------------------------- */
   R3BUnpackReader* unpackreader = new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
@@ -94,11 +87,26 @@ void califa_ams_los_psp_online() {
 					     offsetof(EXT_STR_h101, ams));
 
 
+  /* Definition of reader --------------------------------- */
+  R3BUnpackReader* unpackreader = new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
+					     offsetof(EXT_STR_h101, unpack));
+  R3BCalifaFebexReader* unpackcalifa = new R3BCalifaFebexReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
+					     offsetof(EXT_STR_h101, califa));
+  R3BAmsReader* unpackams = new R3BAmsReader((EXT_STR_h101_AMS*)&ucesb_struct.ams,
+					     offsetof(EXT_STR_h101, ams));
+  R3BWhiterabbitMasterReader* unpackWRM = new R3BWhiterabbitMasterReader((EXT_STR_h101_WRMASTER*)&ucesb_struct.wrm,
+                                             offsetof(EXT_STR_h101, wrm), 0x100);
+  R3BWhiterabbitCalifaReader* unpackWRC = new R3BWhiterabbitCalifaReader((EXT_STR_h101_WRCALIFA*)&ucesb_struct.wrcalifa,
+                                             offsetof(EXT_STR_h101, wrcalifa), 0x400);
+  R3BWhiterabbitAmsReader* unpackWRA = new R3BWhiterabbitAmsReader((EXT_STR_h101_WRAMS*)&ucesb_struct.wrams,
+                                             offsetof(EXT_STR_h101, wrams), 0x300);
+
+
   /* Add readers ------------------------------------------ */
   source->AddReader(unpackreader);
-  source->AddReader(new R3BWhiterabbitMasterReader((EXT_STR_h101_WRMASTER*)&ucesb_struct.wrm,offsetof(EXT_STR_h101, wrm), 0x100));
-  source->AddReader(new R3BWhiterabbitCalifaReader((EXT_STR_h101_WRCALIFA*)&ucesb_struct.wrcalifa,offsetof(EXT_STR_h101, wrcalifa), 0x400));
-  source->AddReader(new R3BWhiterabbitAmsReader((EXT_STR_h101_WRAMS*)&ucesb_struct.wrams,offsetof(EXT_STR_h101, wrams), 0x300));
+  source->AddReader(unpackWRM);
+  source->AddReader(unpackWRC);
+  source->AddReader(unpackWRA);
   unpackcalifa->SetOnline(true);
   source->AddReader(unpackcalifa);
   unpackams->SetOnline(true);
@@ -194,7 +202,7 @@ void califa_ams_los_psp_online() {
   Cal2HitCalifa->SetClusteringAlgorithm(1,0);
   Cal2HitCalifa->SetDetectionThreshold(200);    //200 KeV
   Cal2HitCalifa->SetDRThreshold(500);           //0.5 MeV
-  Cal2HitCalifa->SetExperimentalResolution(0.); //6% at 1 MeV
+  Cal2HitCalifa->SetExperimentalResolution(0.); //6% at 1 MeV (Only for simulation)
   Cal2HitCalifa->SetAngularWindow(0.25,0.25);   //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
   run->AddTask(Cal2HitCalifa);
  
