@@ -1,4 +1,4 @@
-/* 
+/*
  * Macro to run the online for califa and ams detectors simultaneously
  *
  * Author: Jose Luis <joseluis.rodriguez.sanchez@usc.es>
@@ -112,11 +112,11 @@ void califa_ams_los_psp_online() {
   unpackams->SetOnline(true);
   source->AddReader(unpackams);
 
-  if(los_in){ 
-   R3BLosReader *unpacklos = new R3BLosReader((EXT_STR_h101_LOS_TAMEX *)&ucesb_struct.los, 
+  if(los_in){
+   R3BLosReader *unpacklos = new R3BLosReader((EXT_STR_h101_LOS_TAMEX *)&ucesb_struct.los,
 	                          offsetof(EXT_STR_h101, los));
    unpacklos->SetOnline(true);
-   source->AddReader(unpacklos); 
+   source->AddReader(unpacklos);
   }
 
   if(psp_in){
@@ -190,7 +190,7 @@ void califa_ams_los_psp_online() {
   }
 
 
-  /* Add analysis tasks ----------------------------------- */ 
+  /* Add analysis tasks ----------------------------------- */
 
   //R3BCalifaMapped2CrystalCal ---
   R3BCalifaMapped2CrystalCal* Map2CalCalifa = new R3BCalifaMapped2CrystalCal();
@@ -199,13 +199,11 @@ void califa_ams_los_psp_online() {
   //R3BCalifaCrystalCal2Hit ---
   R3BCalifaCrystalCal2Hit* Cal2HitCalifa = new R3BCalifaCrystalCal2Hit();
   Cal2HitCalifa->SelectGeometryVersion(444);
-  Cal2HitCalifa->SetClusteringAlgorithm(1,0);
+  Cal2HitCalifa->SetSquareWindowAlg(0.25,0.25);   //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
   Cal2HitCalifa->SetDetectionThreshold(200);    //200 KeV
   Cal2HitCalifa->SetDRThreshold(500);           //0.5 MeV
-  Cal2HitCalifa->SetExperimentalResolution(0.); //6% at 1 MeV (Only for simulation)
-  Cal2HitCalifa->SetAngularWindow(0.25,0.25);   //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
   run->AddTask(Cal2HitCalifa);
- 
+
   R3BAmsMapped2StripCal* Map2CalAms = new R3BAmsMapped2StripCal();
   Map2CalAms->SetOnline(true);
   Map2CalAms->SetThresholdSigma(5);
@@ -231,27 +229,27 @@ void califa_ams_los_psp_online() {
    run->AddTask( losMapped2Cal );
 
    R3BLosCal2Hit* losCal2Hit=new R3BLosCal2Hit("losCal2Hit", 1);
- 
+
 // Set parameters for X,Y calibration
-// offsetX1, offsetY1,VeffX1,VeffY1, offsetX2, offsetY2,VeffX2,VeffY2 
+// offsetX1, offsetY1,VeffX1,VeffY1, offsetX2, offsetY2,VeffX2,VeffY2
    losCal2Hit->SetLosParamMCFD(0., 0., 1., 1. ,0., 0., 1., 1.);                 // spectra X1_vs_Y1, X2_vs_Y2
-   losCal2Hit->SetLosParamMCFDwc(0., 0., 1., 1. ,0., 0., 1., 1.);               // spectra X1_vs_Y1_wc, X2_vs_Y2_wc    
-   losCal2Hit->SetLosParamToT(0., 0., 1., 1. ,0., 0., 1., 1.); 
-   losCal2Hit->SetLosParamTAMEX(0., 0., 1., 1. ,0., 0., 1., 1.);                // spectra XT1_vs_YT1, XT2_vs_YT2     
+   losCal2Hit->SetLosParamMCFDwc(0., 0., 1., 1. ,0., 0., 1., 1.);               // spectra X1_vs_Y1_wc, X2_vs_Y2_wc
+   losCal2Hit->SetLosParamToT(0., 0., 1., 1. ,0., 0., 1., 1.);
+   losCal2Hit->SetLosParamTAMEX(0., 0., 1., 1. ,0., 0., 1., 1.);                // spectra XT1_vs_YT1, XT2_vs_YT2
    losCal2Hit->SetLosParamToTc(0., 0., 1., 1. ,0., 0., 1., 1.);
-     
+
 // Set Sci shape, variable iSciType:
 // 0 - Large (10x10) squared, with 2-inch PM
 // 1 - Small octagonal, with 1-inch PM
-// 2 - Small (5x5) squared, with 2-inch PM  
-// 3 - Large octagonal, with 2-inch PM 
+// 2 - Small (5x5) squared, with 2-inch PM
+// 3 - Large octagonal, with 2-inch PM
 // 4 - Large (10x10) squared, with 1-inch PM
 // 5 - Large octagional, with 4 2-inch and 4 1inch PMs
 // 6 - Large octagional, with 8 1-inch PMs
 
 // losCal2Hit->SetLosInput(iSciType,walk_param_file_name,totcorrection_factor_file_name);
 
-   losCal2Hit->SetLosInput(6,"walk_param_empty.dat","tot_param_empty.dat");             
+   losCal2Hit->SetLosInput(6,"walk_param_empty.dat","tot_param_empty.dat");
    run->AddTask( losCal2Hit );
   }
 
@@ -304,7 +302,7 @@ void califa_ams_los_psp_online() {
 
   cout << endl;
   std::cout << "Output file is " << outputFileName << std::endl;
-  cout << "Real time " << rtime << " s, CPU time " << ctime << "s" 
+  cout << "Real time " << rtime << " s, CPU time " << ctime << "s"
        << endl << endl;
   cout << "Macro finished successfully." << endl;
   //gApplication->Terminate();

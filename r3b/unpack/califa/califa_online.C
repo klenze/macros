@@ -25,7 +25,7 @@ void califa_online(){
   const Int_t nev = -1;     // number of events to read, -1 - until CTRL+C
 
   const Int_t expId = 473; //select: 444, 454 or 473
-  
+
   // Create source using ucesb for input ---------------------------------------
   TString filename = "--stream=lxir123.gsi.de:8006";
   //TString filename = "~/lmd/main0223_st.lmd";
@@ -62,7 +62,7 @@ void califa_online(){
 
 
   /* Definition of Ucesb --------------------------------- */
-  EXT_STR_h101 ucesb_struct;  
+  EXT_STR_h101 ucesb_struct;
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
 					      ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
   source->SetMaxEvents(nev);
@@ -87,7 +87,7 @@ void califa_online(){
   source->AddReader(unpackWRC);
   unpackcalifa->SetOnline(true);
   source->AddReader(unpackcalifa);
-  
+
 
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
@@ -102,8 +102,8 @@ void califa_online(){
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
 
-  /* Load parameters   ------------------------------------ */ 
-  //Choose Root or Ascii file	
+  /* Load parameters   ------------------------------------ */
+  //Choose Root or Ascii file
   //1-Root file with the Calibartion Parameters
   FairParRootFileIo* parIo1 = new FairParRootFileIo();
   parIo1->open(calfilename,"in");
@@ -114,7 +114,7 @@ void califa_online(){
     rtdb->setOutput(parIo1);
     rtdb->saveOutput();
   */
-  
+
 
   // Create analysis task ------------------------------------------------------
   //R3BCalifaMapped2CrystalCal ---
@@ -125,11 +125,9 @@ void califa_online(){
   R3BCalifaCrystalCal2Hit* Cal2Hit = new R3BCalifaCrystalCal2Hit();
   Cal2Hit->SetOnline(true);
   Cal2Hit->SelectGeometryVersion(444);    //444 version is for S444, S454 and S473 experiments
-  Cal2Hit->SetClusteringAlgorithm(1,0);
+  Cal2Hit->SetSquareWindowAlg(0.25,0.25);     //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
   Cal2Hit->SetDetectionThreshold(200);    //200 KeV
   Cal2Hit->SetDRThreshold(2000);          //2 MeV
-  Cal2Hit->SetExperimentalResolution(0.); //6% at 1 MeV (Only for simulation)
-  Cal2Hit->SetAngularWindow(0.25,0.25);   //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
   run->AddTask(Cal2Hit);
 
 
@@ -170,7 +168,7 @@ void califa_online(){
 
   cout << endl;
   std::cout << "Output file is " << outputFileName << std::endl;
-  cout << "Real time " << rtime << " s, CPU time " << ctime << "s" 
+  cout << "Real time " << rtime << " s, CPU time " << ctime << "s"
        << endl << endl;
   cout << "Macro finished successfully." << endl;
   //gApplication->Terminate();

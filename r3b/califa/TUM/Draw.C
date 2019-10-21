@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-
+<
 #include <TClonesArray.h>
 #include <TTree.h>
 #include <TBranch.h>
@@ -20,8 +20,8 @@
 
 #include <R3BMCTrack.h>
 #include <R3BCalifaMappedData.h>
-#include <R3BCalifaHitDataSim.h>
-#include <R3BCalifaCrystalCalDataSim.h>
+#include <R3BCalifaHitData.h>
+#include <R3BCalifaCrystalCalData.h>
 #include <R3BCalifaGeometry.h>
 #include <R3BDetectorList.h>
 #include <startrackerData/R3BSTaRTrackerHit.h>
@@ -101,11 +101,6 @@ void GenChannelMapping()
       // Experimental data
       hits = new TClonesArray("R3BCalifaCrystalCalData");
     }
-    else if((b = events->GetBranch("CalifaCrystalCalDataSim")))
-    {
-      // Simulated data
-      hits = new TClonesArray("R3BCalifaCrystalCalDataSim");
-    }
     else
     {
       cerr << "No crystal hit found in tree!" << endl;
@@ -140,12 +135,6 @@ void GenChannelMapping()
     {
       caloHits = new TClonesArray("R3BCalifaHitData");
       events->SetBranchAddress("califa_CalifaHitData", &caloHits);
-    }
-    else if((b = events->GetBranch("CalifaHitDataSim")))
-    {
-      caloHits = new TClonesArray("R3BCalifaHitDataSim");
-//      b->SetAddress(&caloHits);
-      events->SetBranchAddress("CalifaHitDataSim", &caloHits);
     }
     else
       caloHits = NULL;

@@ -101,12 +101,12 @@ void run_sim()
     //run->AddModule(new R3BSTaRTra("startra_v16-300_2layers.geo.root", { 0., 0., 20. }));
 
     // CALIFA
-    R3BCalifa* califa = new R3BCalifa("califa_10_v8.11.geo.root");
-    califa->SelectGeometryVersion(10);
+    R3BCalifa* califa = new R3BCalifa("califa_2020.geo.root");
+    califa->SelectGeometryVersion(2020);
     // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
     califa->SetNonUniformity(1.0);
     run->AddModule(califa);
-    
+
     // Fi4 detector
     run->AddModule(new R3BFi4("fi4_v17a.geo.root", {-73.274339-TMath::Tan(TMath::DegToRad()*16.7)*100, 0.069976, 513.649524+100.}, {"" ,-90.,16.7,90.}));
 

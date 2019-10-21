@@ -1,4 +1,4 @@
-/* 
+/*
  * Macro to run the online for califa and ams detectors simultaneously
  *
  * Author: Jose Luis <joseluis.rodriguez.sanchez@usc.es>
@@ -15,10 +15,10 @@ void califa_ams_online() {
   TStopwatch timer;
   timer.Start();
 
-  
+
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
 
-  
+
   /* Input --------------------------------------- */
   TString filename = "--stream=lxg0897:6002";
   //TString filename = "~/lmd/344_2019-02-16_17-51-36/data_00*.lmd";
@@ -34,7 +34,7 @@ void califa_ams_online() {
   TString califadir = dir + "/macros/r3b/unpack/califa_ams/";
   TString calfilename = califadir + "Califa_Ams_CalibParamFeb20190218.root";
   calfilename.ReplaceAll("//","/");
-  
+
 
   /* Create source using ucesb for input ------------------ */
   //UCESB paths
@@ -44,11 +44,11 @@ void califa_ams_online() {
   ucesb_path.ReplaceAll("//","/");
 
   EXT_STR_h101 ucesb_struct;
-  
+
   R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
 					      ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
   source->SetMaxEvents(nev);
-  
+
 
   /* Definition of reader --------------------------------- */
   R3BUnpackReader* unpackreader = new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
@@ -68,7 +68,7 @@ void califa_ams_online() {
   unpackams->SetOnline(true);
   source->AddReader(unpackams);
 
-  
+
   /* Create online run ------------------------------------ */
   FairRunOnline* run = new FairRunOnline(source);
   run->SetRunId(1);
@@ -96,17 +96,13 @@ void califa_ams_online() {
   //R3BCalifaCrystalCal2Hit ---
   R3BCalifaCrystalCal2Hit* Cal2HitCalifa = new R3BCalifaCrystalCal2Hit();
   Cal2HitCalifa->SelectGeometryVersion(444);
-  Cal2HitCalifa->SetClusteringAlgorithm(1,0);
+  Cal2HitCalifa->SetSquareWindowAlg(0.25,0.25);  //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
   Cal2HitCalifa->SetDetectionThreshold(200);     //200 KeV
   Cal2HitCalifa->SetDRThreshold(15000);          //15 MeV
-  Cal2HitCalifa->SetExperimentalResolution(0.);  //6% at 1 MeV
-  //Cal2HitCalifa->SetComponentResolution(0.);   //sigma = 0.25 MeV
-  //Cal2HitCalifa->SetPhoswichResolution(3.,5.); //percent @ 1 MeV for LaBr and LaCl
-  Cal2HitCalifa->SetAngularWindow(0.25,0.25);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
   run->AddTask(Cal2HitCalifa);
 
 
-  /* Add analysis tasks ----------------------------------- */  
+  /* Add analysis tasks ----------------------------------- */
   R3BAmsMapped2StripCal* Map2CalAms = new R3BAmsMapped2StripCal();
   Map2CalAms->SetOnline(true);
   run->AddTask(Map2CalAms);

@@ -195,16 +195,16 @@ void checkResults() {
 	
 	//Crystal Hits (input)
 	TClonesArray* crystalHitCA;  
-	R3BCalifaCrystalCalDataSim** crystalHit;
-	crystalHitCA = new TClonesArray("R3BCalifaCrystalCalDataSim",5);
-	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalCalDataSim");
+	R3BCalifaCrystalCalData** crystalHit;
+	crystalHitCA = new TClonesArray("R3BCalifaCrystalCalData",5);
+	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalCalData");
 	branchCrystalHit->SetAddress(&crystalHitCA);
 
 	//Calo Hits (output)
 	TClonesArray* caloHitCA;  
-	R3BCalifaHitDataSim** caloHit;
-	caloHitCA = new TClonesArray("R3BCalifaHitDataSim",5);
-	TBranch *branchCaloHit = TCrystal->GetBranch("CalifaHitDataSim");
+	R3BCalifaHitData** caloHit;
+	caloHitCA = new TClonesArray("R3BCalifaHitData",5);
+	TBranch *branchCaloHit = TCrystal->GetBranch("CalifaHitData");
 	branchCaloHit->SetAddress(&caloHitCA);
 	
 	//MCTrack(input)
@@ -250,17 +250,17 @@ void checkResults() {
 		MCtracksPerEvent = MCTrackCA->GetEntries();
 		
 		if(crystalHitsPerEvent>0) {
-			crystalHit = new R3BCalifaCrystalCalDataSim*[crystalHitsPerEvent];
+			crystalHit = new R3BCalifaCrystalCalData*[crystalHitsPerEvent];
 			for(Int_t j=0;j<crystalHitsPerEvent;j++){
-				crystalHit[j] = new R3BCalifaCrystalCalDataSim;
-				crystalHit[j] = (R3BCalifaCrystalCalDataSim*) crystalHitCA->At(j);      
+				crystalHit[j] = new R3BCalifaCrystalCalData;
+				crystalHit[j] = (R3BCalifaCrystalCalData*) crystalHitCA->At(j);      
 			}
 		}
 		if(caloHitsPerEvent>0) {
-			caloHit = new R3BCalifaHitDataSim*[caloHitsPerEvent];
+			caloHit = new R3BCalifaHitData*[caloHitsPerEvent];
 			for(Int_t j=0;j<caloHitsPerEvent;j++){
-				caloHit[j] = new R3BCalifaHitDataSim;
-				caloHit[j] = (R3BCalifaHitDataSim*) caloHitCA->At(j);      
+				caloHit[j] = new R3BCalifaHitData;
+				caloHit[j] = (R3BCalifaHitData*) caloHitCA->At(j);      
 			}
 		}		
 		if(MCtracksPerEvent>0) {

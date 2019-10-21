@@ -33,11 +33,11 @@ ROOT.gROOT.ProcessLine(
 # pk: yes, that is ugly, and yes, in principle, we could do better
 # by allocating a buffer in python.
 # In reality, instantiating a EXT_STR_h101_CALIFA[_t] does not even work
-#  after gSystem->Load("libR3Bsource"). Whatever. 
+#  after gSystem->Load("libR3Bsource"). Whatever.
 
 def unpack(infiles, output, nev, runNo, exp, ntuple, calibration):
     ROOT.gSystem.ResetSignals()
-    
+
     ucesb_struct=ROOT.EXT_STR_h101()
     source=ROOT.R3BUcesbSource(infiles, ntuple, exp,
                                ucesb_struct, sys.getsizeof(ucesb_struct))
@@ -77,7 +77,7 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(sys.argv[0],\
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,\
         epilog="Any options after -- are passed to ucesb.")
-    
+
     parser.add_argument("-n", "--max-events",
                         type=int, default=-1, dest='nev',
                         help="number of events to process, negative for all")
@@ -92,8 +92,8 @@ if __name__=="__main__":
                         help="input files or network source")
     parser.add_argument("-r", "--run-number", metavar="N",
                         type=int, dest="runNo",
-                        help="run number, used to pick exp unpacker")    
-    parser.add_argument("-x", "--exp", dest="exp", 
+                        help="run number, used to pick exp unpacker")
+    parser.add_argument("-x", "--exp", dest="exp",
                         type=str, metavar="sXYZ",
                         help="Experiment unpacker to use")
     parser.add_argument("-t", "--time-stitch", dest="time-stitch",
@@ -104,7 +104,7 @@ if __name__=="__main__":
                         help="replace default ntuple LVL arg from ucesb")
 
     #parser.print_help()
-    
+
     raw_args=sys.argv[1:]
     ucesb_options=[]
     if "--" in raw_args:
@@ -135,7 +135,7 @@ if __name__=="__main__":
         if not os.access(f, os.R_OK):
             print("Error: count not access input file %s" % f)
             exit(-1)
-    
+
     # finding the unpacker ####################################
     if not args["exp"]:
         r=args["runNo"]
@@ -182,7 +182,7 @@ if __name__=="__main__":
             exit(-1)
     if "time-stitch" in args.keys():    ######################## HERE BE DRAGONS
         # timestitching in the unpacker does not work
-        # so we call the empty unpacker to 
+        # so we call the empty unpacker to
         args["infiles"]=["--time-stitch=wr,%d"%args["time-stitch"], "--input-buffer=100Mi",\
                          "--max-events=%d"%args["nev"],"--output=-"]\
                         + args["infiles"] + [ "|", args["exp"], "--file=-"]
@@ -204,5 +204,3 @@ if __name__=="__main__":
 
     unpack(**args)
 #    print args
-    
-    

@@ -4,11 +4,11 @@ void run(TString runNumber)
     TStopwatch timer;
     timer.Start();
 
-    //const char *landMappingName = "cfg_neuland_s438.hh";   // mapping file
+    // const char *landMappingName = "cfg_neuland_s438.hh";   // mapping file
 
-    TString inputFileName = "XXX.root";           // name of input file
-    TString parFileName    = "YYY.root"; // name of parameter file
-    TString outputFileName = "ZZZ.root";          // name of output file
+    TString inputFileName = "XXX.root";  // name of input file
+    TString parFileName = "YYY.root";    // name of parameter file
+    TString outputFileName = "ZZZ.root"; // name of output file
 
     // Create analysis run -------------------------------------------------------
     FairRunAna* run = new FairRunAna();
@@ -33,12 +33,13 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Calibration ----------------------------------------------------------
-    R3BCalifaMapped2CrystalCal* califaCalibration  = new R3BCalifaMapped2CrystalCal("CalifaMapped2CrystalCal", 0);
+    R3BCalifaMapped2CrystalCal* califaCalibration = new R3BCalifaMapped2CrystalCal("CalifaMapped2CrystalCal", 0);
     run->AddTask(califaCalibration);
     // ---------------------------------------------------------------------------
 
     // Histograms ----------------------------------------------------------------
-    R3BCalifaCrystalCalDataAnalysis* calibrationAna = new R3BCalifaCrystalCalDataAnalysis("CalifaCrystalCalDataAnalysis", 1);
+    R3BCalifaCrystalCalDataAnalysis* calibrationAna =
+        new R3BCalifaCrystalCalDataAnalysis("CalifaCrystalCalDataAnalysis", 1);
     run->AddTask(calibrationAna);
     // ---------------------------------------------------------------------------
 
@@ -62,4 +63,3 @@ void run(TString runNumber)
     cout << "Parameter file is " << parFileName << endl;
     cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
 }
-
