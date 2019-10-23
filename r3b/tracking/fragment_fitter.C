@@ -26,8 +26,10 @@ void fragment_fitter()
     // -------------------------------------------------------------------------
 
     // Propagation task --------------------------------------------------------
-    R3BFragmentFitter* prop = new R3BFragmentFitter("R3BFragmentFitter", kTRUE);
-    run->AddTask(prop);
+    R3BFragmentTracker* tracker = new R3BFragmentTracker("R3BFragmentTracker", kTRUE);
+    tracker->SetEnergyLoss(kTRUE);
+    tracker->SetFragmentFitter(new R3BFragmentFitterChi2());
+    run->AddTask(tracker);
     // -------------------------------------------------------------------------
     
     // Initialize --------------------------------------------------------------
