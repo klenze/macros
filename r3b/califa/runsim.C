@@ -1,3 +1,45 @@
+#ifndef __CINT__
+#include "TString.h"
+#include "TStopwatch.h"
+#include "FairRunSim.h"
+#include "FairRuntimeDb.h"
+#include "FairModule.h"
+#include "FairPrimaryGenerator.h"
+#include "FairBoxGenerator.h"
+#include "R3BCave.h"
+#include "R3BTarget.h"
+#include "R3BGladMagnet.h"
+#include "R3BPsp.h"
+#include "R3BVacVesselCool.h"
+#include "R3BStartrack.h"
+#include "R3BCalifa.h"
+#include "R3BFi4.h"
+#include "R3BFi6.h"
+#include "R3BFi5.h"
+#include "R3Bsfi.h"
+#include "R3BTof.h"
+#include "R3BdTof.h"
+#include "R3BGladFieldMap.h"
+#include "R3BIonGenerator.h"
+#include "R3BAsciiGenerator.h"
+#include "R3BSpecificGenerator.h"
+#include "TRandom3.h"
+#include "TVirtualMC.h"
+#include "FairParRootFileIo.h"
+#include "R3BAladinMagnet.h"
+#include "R3BXBall.h"
+#include "R3BTra.h"
+#include "R3BDch.h"
+#include "R3BmTof.h"
+#include "R3BGfi.h"
+#include "R3BLand.h"
+#include "R3BMfi.h"
+#include "ELILuMon.h"
+#include "R3BAladinFieldMap.h"
+#include "R3BCalifaCrystalCal2Hit.h"
+#include "R3BLandFirstHits.h"
+#endif
+
 void runsim(Int_t nEvents = 0)
 {
 
@@ -269,7 +311,7 @@ void runsim(Int_t nEvents = 0)
     R3BCalifaCrystalCal2Hit* califaHF = new R3BCalifaCrystalCal2Hit();
     califaHF->SetDetectionThreshold(0.000050);//50 KeV
     califaHF->SetExperimentalResolution(5.);  //5% at 1 MeV
-    califaHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+    califaHF->SetConeAlg(3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
     run->AddTask(califaHF);
   }
 

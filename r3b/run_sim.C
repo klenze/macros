@@ -1,3 +1,33 @@
+#ifndef __CINT__
+#include "TString.h"
+#include "TStopwatch.h"
+#include "FairRunSim.h"
+#include "FairRuntimeDb.h"
+#include "FairModule.h"
+#include "FairPrimaryGenerator.h"
+#include "FairBoxGenerator.h"
+#include "R3BCave.h"
+#include "R3BTarget.h"
+#include "R3BGladMagnet.h"
+#include "R3BPsp.h"
+#include "R3BVacVesselCool.h"
+#include "R3BStartrack.h"
+#include "R3BCalifa.h"
+#include "R3BFi4.h"
+#include "R3BFi6.h"
+#include "R3BFi5.h"
+#include "R3Bsfi.h"
+#include "R3BTof.h"
+#include "R3BdTof.h"
+#include "R3BGladFieldMap.h"
+#include "R3BIonGenerator.h"
+#include "R3BAsciiGenerator.h"
+#include "R3BSpecificGenerator.h"
+#include "TRandom3.h"
+#include "TVirtualMC.h"
+#include "FairParRootFileIo.h"
+#endif
+
 void run_sim()
 {
     TString transport = "TGeant4";
