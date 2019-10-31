@@ -1,33 +1,3 @@
-#ifndef __CINT__
-#include "TString.h"
-#include "TStopwatch.h"
-#include "FairRunSim.h"
-#include "FairRuntimeDb.h"
-#include "FairModule.h"
-#include "FairPrimaryGenerator.h"
-#include "FairBoxGenerator.h"
-#include "R3BCave.h"
-#include "R3BTarget.h"
-#include "R3BGladMagnet.h"
-#include "R3BPsp.h"
-#include "R3BVacVesselCool.h"
-#include "R3BStartrack.h"
-#include "R3BCalifa.h"
-#include "R3BFi4.h"
-#include "R3BFi6.h"
-#include "R3BFi5.h"
-#include "R3Bsfi.h"
-#include "R3BTof.h"
-#include "R3BdTof.h"
-#include "R3BGladFieldMap.h"
-#include "R3BIonGenerator.h"
-#include "R3BAsciiGenerator.h"
-#include "R3BSpecificGenerator.h"
-#include "TRandom3.h"
-#include "TVirtualMC.h"
-#include "FairParRootFileIo.h"
-#endif
-
 void run_sim()
 {
     TString transport = "TGeant4";
@@ -103,8 +73,6 @@ void run_sim()
     // CALIFA
     R3BCalifa* califa = new R3BCalifa("califa_2020.geo.root");
     califa->SelectGeometryVersion(2020);
-    // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    califa->SetNonUniformity(1.0);
     run->AddModule(califa);
 
     // Fi4 detector

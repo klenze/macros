@@ -88,10 +88,8 @@ void run_sim(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int_t 
     // run->AddModule(new R3BSTaRTra("startra_v16-300_2layers.geo.root", { 0., 0., 20. }));
 
     // CALIFA
-    R3BCalifa* califa = new R3BCalifa("califa_10_v8.11.geo.root");
-    califa->SelectGeometryVersion(10);
-    // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    califa->SetNonUniformity(1.0);
+    //R3BCalifa* califa = new R3BCalifa("califa_2020.geo.root");
+    //califa->SelectGeometryVersion(2020);
     // run->AddModule(califa);
 
     // Fi4 detector

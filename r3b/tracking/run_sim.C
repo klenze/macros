@@ -70,7 +70,7 @@ void run_sim()
 
     // PSP
     run->AddModule(new R3BPsp("psp_v13a.geo.root", {}, -221., -89., 94.1));
-    
+
     // Fi4 detector
     run->AddModule(new R3BFi4("fi4_v17a.geo.root", {(614. - 308.8)*TMath::Tan(-18.*TMath::DegToRad()) - 42., 0.069976, 614.}, {"" ,-90.,16.7,90.}));
 
@@ -87,10 +87,8 @@ void run_sim()
     //run->AddModule(new R3BSTaRTra("startra_v16-300_2layers.geo.root", { 0., 0., 20. }));
 
     // CALIFA
-    R3BCalifa* califa = new R3BCalifa("califa_10_v8.11.geo.root");
-    califa->SelectGeometryVersion(10);
-    // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    califa->SetNonUniformity(1.0);
+    R3BCalifa* califa = new R3BCalifa("califa_2020.geo.root");
+    califa->SelectGeometryVersion(2020);
     //run->AddModule(califa);
 
     // Tof

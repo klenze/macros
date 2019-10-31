@@ -73,8 +73,6 @@ void run_gen_sim()
     // CALIFA
     R3BCalifa* califa = new R3BCalifa("califa_2020.geo.root");
     califa->SelectGeometryVersion(2020);
-    // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    califa->SetNonUniformity(1.0);
     run->AddModule(califa);
 
     // Fi4 detector

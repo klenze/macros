@@ -125,10 +125,8 @@ void eliall(Int_t nEvents,
     // CALIFA Calorimeter
     if (fDetList.FindObject("CALIFA"))
     {
-        R3BCalifa* califa = new R3BCalifa("califa_v13_811.geo.root");
-        califa->SelectGeometryVersion(10);
-        // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-        califa->SetNonUniformity(1.0);
+        R3BCalifa* califa = new R3BCalifa("califa_2020.geo.root");
+        califa->SelectGeometryVersion(2020);
         run->AddModule(califa);
     }
 
