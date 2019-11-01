@@ -13,6 +13,8 @@
 #include "R3BVacVesselCool.h"
 #include "R3BStartrack.h"
 #include "R3BCalifa.h"
+#include "R3BCALIFATestGenerator.h"
+#include "R3BCalifaDigitizer.h"
 #include "R3BFi4.h"
 #include "R3BFi6.h"
 #include "R3BFi5.h"
