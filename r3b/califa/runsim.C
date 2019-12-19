@@ -1,4 +1,4 @@
-#ifndef __CINT__
+#ifndef __CLING__
 #include "TString.h"
 #include "TStopwatch.h"
 #include "FairRunSim.h"
