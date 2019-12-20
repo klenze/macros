@@ -1,4 +1,3 @@
-INCLUDE(R3BROOTMacros)
 GENERATE_ROOT_TEST_SCRIPT(${R3BROOT_SOURCE_DIR}/macros/r3b/run_gen_sim.C)
 add_test(run_gen_sim ${R3BROOT_BINARY_DIR}/macros/r3b/run_gen_sim.sh)
 SET_TESTS_PROPERTIES(run_gen_sim PROPERTIES TIMEOUT "300")
@@ -11,7 +10,7 @@ SET_TESTS_PROPERTIES(testR3BPhaseSpaceGeneratorIntegration PROPERTIES TIMEOUT "1
 SET_TESTS_PROPERTIES(testR3BPhaseSpaceGeneratorIntegration PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed;All ok")
 
 
-GENERATE_ROOTPLUS_TEST_SCRIPT(${R3BROOT_SOURCE_DIR}/macros/r3b/run_sim.C)
+GENERATE_ROOT_TEST_SCRIPT(${R3BROOT_SOURCE_DIR}/macros/r3b/run_sim.C)
 GENERATE_ROOT_TEST_SCRIPT(${R3BROOT_SOURCE_DIR}/macros/r3b/run_digi.C)
 configure_file(${R3BROOT_SOURCE_DIR}/macros/r3b/run_digi_test.sh.in ${R3BROOT_BINARY_DIR}/macros/r3b/run_digi_test.sh)
 add_test(run_digi ${R3BROOT_BINARY_DIR}/macros/r3b/run_digi_test.sh)
